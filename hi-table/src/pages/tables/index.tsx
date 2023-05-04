@@ -4,15 +4,9 @@ import React, { useState } from "react";
 import { MdAlarm } from "react-icons/md";
 import { TbToolsKitchen2 } from "react-icons/tb";
 import { SiGoogleassistant } from "react-icons/si";
-import {
-  MdOutlineDinnerDining,
-  MdMenuOpen,
-  MdTableRestaurant,
-  MdOutlineTableRestaurant,
-  MdOutlineReceiptLong,
-  MdAutorenew,
-} from "react-icons/md";
-import { RxBell } from "react-icons/rx";
+import {MdOutlineDinnerDining ,MdOutlinePeopleOutline} from "react-icons/md";
+import Footer from "@/components/atoms/footer";
+import { HiSearch, HiX } from "react-icons/hi";
 
 type Zone = {
   zoneName: string;
@@ -172,12 +166,29 @@ const zones = [
 function Table() {
   const [zoneData, setZoneData] = useState(zones);
   const [filterClicked, setFilterClicked] = useState(false);
+  const [search, setSearch] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
 
   // const buttonProps = {
   //   onClick: () => {
   //     console.log("u clicked the button");
   //   },
   // };
+
+  const popOver = (search = "") => {
+    if (search.length > 0) {
+      if (!searchOpen) {
+        setSearchOpen(true);
+      }
+    } else {
+      setSearchOpen(false);
+    }
+  };
+
+  const searchClick = () => {
+    setSearchOpen(!searchOpen);
+    setSearch("");
+  };
 
   const handleOnclick = (str: any) => {
     if (str.toLowerCase() === "occupied") {
@@ -216,7 +227,7 @@ function Table() {
   const classByStatus = {
     occupied: {
       classNames:
-        "relative h-[5.75rem] mx-6 my-4 border border-[#e1e1e1]/50 rounded-xl bg-[#E3EFFF]",
+        "relative h-[5.75rem] mx-6 mb-4 border border-[#e1e1e1]/50 rounded-xl bg-[#E3EFFF]",
       businessNameClasses:
         "absolute font-[500] capitalize truncate left-6 top-9 w-[50%]",
       tableClasses: "right-8 top-6 absolute text-[1rem] opacity-50",
@@ -225,7 +236,7 @@ function Table() {
     },
     reserved: {
       classNames:
-        "relative h-[3.75rem]  mx-6 my-4 border border-[#e1e1e1]/50 rounded-xl bg-gray-200",
+        "relative h-[3.75rem]  mx-6 mb-4 border border-[#e1e1e1]/50 rounded-xl bg-gray-200",
       businessNameClasses:
         "absolute font-[500] capitalize truncate left-6 top-2 w-[50%]",
       tableClasses: "right-8 top-2 absolute text-[1rem] opacity-50",
@@ -234,7 +245,7 @@ function Table() {
     },
     empty: {
       classNames:
-        "relative h-[3.75rem]  mx-6 my-4 border border-[#e1e1e1]/50 rounded-xl bg-[#DBFFE2]",
+        "relative h-[3.75rem]  mx-6 mb-4 border border-[#e1e1e1]/50 rounded-xl bg-[#DBFFE2]",
       businessNameClasses:
         "absolute font-[500] capitalize truncate left-6 top-2 w-[50%]",
       tableClasses: "right-8 top-2 absolute text-[1rem] opacity-50",
@@ -243,7 +254,7 @@ function Table() {
     },
     settled: {
       classNames:
-        "relative h-[5.75rem] mx-6 my-4 border border-[#e1e1e1]/50 rounded-xl bg-[#FFF3D3]",
+        "relative h-[5.75rem] mx-6 mb-4 border border-[#e1e1e1]/50 rounded-xl bg-[#FFF3D3]",
       businessNameClasses:
         "absolute font-[500] capitalize truncate left-6 top-9 w-[50%]",
       tableClasses: "right-8 top-6 absolute text-[1rem] opacity-50",
@@ -252,7 +263,7 @@ function Table() {
     },
     ["need assistance"]: {
       classNames:
-        "relative h-[5.75rem]  mx-6 my-4 border border-[#e1e1e1]/50 rounded-xl bg-[#FFE5E5]",
+        "relative h-[5.75rem]  mx-6 mb-4 border border-[#e1e1e1]/50 rounded-xl bg-[#FFE5E5]",
       businessNameClasses:
         "absolute font-[500] capitalize truncate left-6 top-9 w-[50%]",
       tableClasses: "right-8 top-6 absolute text-[1rem] opacity-50",
@@ -260,36 +271,45 @@ function Table() {
         "absolute right-6 bottom-6 text-sm font-[500] text-[#2C62F0]",
     },
   };
+  const searchData = zoneData.filter(
+    (ele) =>
+      ele?.zoneName?.toLowerCase()?.includes(search?.toLowerCase()) ||
+      ele?.status?.toLowerCase()?.includes(search?.toLowerCase())
+  );
 
   return (
     <div className="bg-[#f5f5f5] pb-6 relative">
       <Header />
       <div className="sticky top-0 z-50 bg-[#f5f5f5]">
         <div className="flex justify-between">
-          <div className="ml-6 mt-8 font-bold capitalize text-[#002D4B] text-[1rem] leading-[1.25rem]">
+          <div
+            className={`${
+              searchOpen ? "hidden" : ""
+            } ml-6 mt-8 font-bold capitalize text-[#002D4B] text-[1rem] leading-[1.25rem]`}
+          >
             Platinum
           </div>
-          <div className="mt-6  mr-6 w-[30%]">
+          <div
+            onClick={searchClick}
+            className={`${
+              searchOpen ? "w-[100%] mb-6" : "w-[30%] disabled"
+            } mt-6 mx-6 `}
+          >
             <label htmlFor="simple-search" className="sr-only">
               Search
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 flex items-center pointer-events-none right-2">
-                <svg
-                  aria-hidden="true"
-                  className="w-4 h-4 text-[#2C62F0]/80 dark:text-[#2C62F0]"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                    clip-rule="evenodd"
-                  ></path>
-                </svg>
-              </div>
+              {searchOpen ? (
+                <HiX className="absolute inset-y-0 w-4 h-4 text-[#2C62F0]/80 dark:text-[#2C62F0] flex items-center pointer-events-none top-[0.625rem] right-2" />
+              ) : (
+                <HiSearch className="absolute inset-y-0 w-4 h-4 text-[#2C62F0]/80 dark:text-[#2C62F0] flex items-center pointer-events-none top-[0.625rem] right-2" />
+              )}
               <input
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  popOver(e.target.value);
+                }}
+                value={search}
                 type="text"
                 id="simple-search"
                 className="border  border-gray-300 text-gray-900 text-sm rounded-xl focus:outline-none focus:border-[#2C62F0] block w-full pl-4 p-1.5"
@@ -299,7 +319,11 @@ function Table() {
             </div>
           </div>
         </div>
-        <div className="sticky flex justify-between pb-6 mx-6 mt-6 shadow">
+        <div
+          className={`${
+            searchOpen ? "hidden" : ""
+          } sticky flex justify-between pb-6 mx-6 mt-6`}
+        >
           <HeaderButton onClick={() => handleOnclick("Occupied")}>
             <MdAlarm className="mt-1 mr-1 -ml-1 text-[#2C62F0]" />
             Occupied
@@ -315,108 +339,157 @@ function Table() {
         </div>
       </div>
       <div className="mb-[4rem]">
-        {zoneData.map((ele: any, index) => (
-          <div
-            key={index}
-            className={`${
-              classByStatus[ele?.status.toLowerCase()]?.classNames
-            }`}
-          >
-            <div
-              className={`${
-                classByStatus[ele?.status.toLowerCase()].businessNameClasses
-              }`}
-            >
-              {ele.zoneName}
-            </div>
-            <MdTableRestaurant
-              className={`${
-                classByStatus[ele?.status.toLowerCase()].tableClasses
-              }`}
-            />
-            <div
-              className={`${
-                classByStatus[ele?.status.toLowerCase()].numberClasses
-              }`}
-            >
-              {ele?.tableOccupied < 10
-                ? `0${ele?.tableOccupied}`
-                : ele?.tableOccupied == null
-                ? "00"
-                : ele?.tableOccupied}
-              /
-              {ele?.zoneCapacity < 10
-                ? `0${ele?.zoneCapacity}`
-                : ele?.zoneCapacity}
-            </div>
-            {ele.status.toLowerCase() !== "empty" &&
-              ele.status.toLowerCase() !== "reserved" && (
-                <div>
-                  <div className="absolute top-3 left-6 text-sm font-[500] text-[#2C62F0]">
-                    10:00
-                  </div>
+        {searchData.length > 0 ? (
+          <div>
+            {searchData.map((ele: any, index) => (
+              <div
+                key={index}
+                className={`${
+                  classByStatus[ele?.status.toLowerCase()]?.classNames
+                }`}
+              >
+                <div
+                  className={`${
+                    classByStatus[ele?.status.toLowerCase()].businessNameClasses
+                  }`}
+                >
+                  {ele.zoneName}
                 </div>
-              )}
-            <div className="absolute bottom-2 left-6 capitalize font-semibold text-[#002D4B]/40 text-[0.875rem] leading-[1rem]">
-              {ele.status}
-            </div>
-
-            {ele.status.toLowerCase() !== "empty" &&
-              ele.status.toLowerCase() !== "reserved" && (
-                <div>
-                  <MdOutlineDinnerDining
-                    className={`right-[5.5rem] top-6 absolute text-[1rem] opacity-50`}
-                  />
-                  <div
-                    className={`absolute right-20 bottom-6 text-sm font-[500] text-[#2C62F0]`}
-                  >
-                    {ele?.tableOccupied < 10
-                      ? `0${ele?.tableOccupied}`
-                      : ele?.tableOccupied == null
-                      ? "00"
-                      : ele?.tableOccupied}
-                    /
-                    {ele?.zoneCapacity < 10
-                      ? `0${ele?.zoneCapacity}`
-                      : ele?.zoneCapacity}
-                  </div>
+                <MdOutlinePeopleOutline
+                  className={`${
+                    classByStatus[ele?.status.toLowerCase()].tableClasses
+                  }`}
+                />
+                <div
+                  className={`${
+                    classByStatus[ele?.status.toLowerCase()].numberClasses
+                  }`}
+                >
+                  {ele?.tableOccupied < 10
+                    ? `0${ele?.tableOccupied}`
+                    : ele?.tableOccupied == null
+                    ? "00"
+                    : ele?.tableOccupied}
+                  /
+                  {ele?.zoneCapacity < 10
+                    ? `0${ele?.zoneCapacity}`
+                    : ele?.zoneCapacity}
                 </div>
-              )}
+                {ele.status.toLowerCase() !== "empty" &&
+                  ele.status.toLowerCase() !== "reserved" && (
+                    <div>
+                      <div className="absolute top-3 left-6 text-sm font-[500] text-[#2C62F0]">
+                        10:00
+                      </div>
+                    </div>
+                  )}
+                <div className="absolute bottom-2 left-6 capitalize font-normal text-[#002D4B]/40 text-[0.875rem] leading-[1rem]">
+                  {ele.status}
+                </div>
+
+                {ele.status.toLowerCase() !== "empty" &&
+                  ele.status.toLowerCase() !== "reserved" && (
+                    <div>
+                      <MdOutlineDinnerDining
+                        className={`right-[5.5rem] top-6 absolute text-[1rem] opacity-50`}
+                      />
+                      <div
+                        className={`absolute right-20 bottom-6 text-sm font-[500] text-[#2C62F0]`}
+                      >
+                        {ele?.tableOccupied < 10
+                          ? `0${ele?.tableOccupied}`
+                          : ele?.tableOccupied == null
+                          ? "00"
+                          : ele?.tableOccupied}
+                        /
+                        {ele?.zoneCapacity < 10
+                          ? `0${ele?.zoneCapacity}`
+                          : ele?.zoneCapacity}
+                      </div>
+                    </div>
+                  )}
+              </div>
+            ))}
           </div>
-        ))}
+        ) : searchData.length == 0 ? (
+          <div className="text-center text-[2rem] bg-[#f5f5f5] h-screen mt-[4rem]">
+            There are no Tables
+          </div>
+        ) : (
+          <div>
+            {zoneData.map((ele: any, index) => (
+              <div
+                key={index}
+                className={`${
+                  classByStatus[ele?.status.toLowerCase()]?.classNames
+                }`}
+              >
+                <div
+                  className={`${
+                    classByStatus[ele?.status.toLowerCase()].businessNameClasses
+                  }`}
+                >
+                  {ele.zoneName}
+                </div>
+                <MdOutlinePeopleOutline
+                  className={`${
+                    classByStatus[ele?.status.toLowerCase()].tableClasses
+                  }`}
+                />
+                <div
+                  className={`${
+                    classByStatus[ele?.status.toLowerCase()].numberClasses
+                  }`}
+                >
+                  {ele?.tableOccupied < 10
+                    ? `0${ele?.tableOccupied}`
+                    : ele?.tableOccupied == null
+                    ? "00"
+                    : ele?.tableOccupied}
+                  /
+                  {ele?.zoneCapacity < 10
+                    ? `0${ele?.zoneCapacity}`
+                    : ele?.zoneCapacity}
+                </div>
+                {ele.status.toLowerCase() !== "empty" &&
+                  ele.status.toLowerCase() !== "reserved" && (
+                    <div>
+                      <div className="absolute top-3 left-6 text-sm font-[500] text-[#2C62F0]">
+                        10:00
+                      </div>
+                    </div>
+                  )}
+                <div className="absolute bottom-2 left-6 capitalize font-semibold text-[#002D4B]/40 text-[0.875rem] leading-[1rem]">
+                  {ele.status}
+                </div>
+
+                {ele.status.toLowerCase() !== "empty" &&
+                  ele.status.toLowerCase() !== "reserved" && (
+                    <div>
+                      <MdOutlineDinnerDining
+                        className={`right-[5.5rem] top-6 absolute text-[1rem] opacity-50`}
+                      />
+                      <div
+                        className={`absolute right-20 bottom-6 text-sm font-[500] text-[#2C62F0]`}
+                      >
+                        {ele?.tableOccupied < 10
+                          ? `0${ele?.tableOccupied}`
+                          : ele?.tableOccupied == null
+                          ? "00"
+                          : ele?.tableOccupied}
+                        /
+                        {ele?.zoneCapacity < 10
+                          ? `0${ele?.zoneCapacity}`
+                          : ele?.zoneCapacity}
+                      </div>
+                    </div>
+                  )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
-      <div className="bg-[#2C62F0] shadow-base-100 fixed bottom-0 z-20 w-full py-2 shadow-lg">
-        <div className="flex justify-between mx-6">
-          <div>
-            <button className="px-4 py-1 text-white transition-colors bg-[#2C62F0] rounded-full focus:bg-white/80 focus:text-[#2C62F0] focus:outline-none">
-              <MdOutlineTableRestaurant className="text-[1rem]" />
-            </button>
-
-            <div className={`text-sm ml-1 font-normal text-white`}>Tables</div>
-          </div>
-          <div>
-            <button className="px-4 py-1 text-white transition-colors bg-[#2C62F0] rounded-full focus:bg-white/80 focus:text-[#2C62F0] focus:outline-none">
-              <MdAutorenew className="text-[1rem]" />
-            </button>
-
-            <div className={`text-sm ml-1 font-normal text-white`}>Status</div>
-          </div>
-          <div>
-            <button className="px-4 py-1 text-white transition-colors bg-[#2C62F0] rounded-full focus:bg-white/80 focus:text-[#2C62F0] focus:outline-none">
-              <RxBell className="text-[1rem]" />
-            </button>
-
-            <div className={`text-sm ml-1 font-normal text-white`}>Alerts</div>
-          </div>
-          <div>
-            <button className="px-4 py-1 text-white transition-colors bg-[#2C62F0] rounded-full focus:bg-white/80 focus:text-[#2C62F0] focus:outline-none">
-              <MdOutlineReceiptLong className="text-[1rem]" />
-            </button>
-
-            <div className={`text-sm ml-1 font-normal text-white`}>Orders</div>
-          </div>
-        </div>
-      </div>
+      <Footer />
     </div>
   );
 }
