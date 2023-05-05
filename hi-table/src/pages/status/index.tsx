@@ -6,6 +6,7 @@ import { TbToolsKitchen2 } from "react-icons/tb";
 import { SiGoogleassistant } from "react-icons/si";
 import Footer from "@/components/atoms/footer";
 import { HiSearch, HiX } from "react-icons/hi";
+import { BiBowlRice } from "react-icons/bi";
 
 function Status() {
   const [filterClicked, setFilterClicked] = useState(false);
@@ -83,7 +84,9 @@ function Status() {
           <div
             onClick={searchClick}
             className={`${
-              searchOpen ? "w-[100%] mb-6" : "w-[30%] disabled"
+              searchOpen
+                ? "w-[100%] transition-all duration-300 mb-6"
+                : "w-[30%] disabled"
             } mt-6 mx-6 `}
           >
             <label htmlFor="simple-search" className="sr-only">
@@ -129,7 +132,8 @@ function Status() {
           </HeaderButton>
         </div>
       </div>
-      <div className="bg-white mx-6 rounded-2xl">
+
+      <div className="bg-white mx-6 rounded-2xl mt-6 mb-[5rem]">
         <div className="flex justify-between mx-4 pt-4">
           <div className="flex flex-col">
             <div className="font-[500] capitalize">T-21</div>
@@ -147,6 +151,73 @@ function Status() {
           </div>
         </div>
         <div className="mx-4 border-2 border-gray-400/50 rounded-full mt-4"></div>
+        <div>
+          <div className="flex justify-between mx-4 mt-4">
+            <div className="w-[10%] font-[500]">11 x</div>
+            <div className="w-[60%] -ml-4 font-[500]">
+              Chicken Peri Sandwich With Extra Sauce
+              <div className="capitalize font-normal text-[#002D4B]/40 text-[0.875rem] mt-1 leading-[1rem]">
+                sankalesh ashok harak sasa kiasajs
+              </div>
+              <div className="capitalize font-normal text-[#002D4B]/40 text-[0.875rem] mt-1 leading-[1rem]">
+                Harak
+              </div>
+            </div>
+            <div className="w-[15%] text-right text-md font-[500] text-[#2C62F0]">
+              Status
+            </div>
+          </div>
+          <div className="py-4 mx-4">
+            <button
+              className={`font-normal relative px-2 text-black rounded-full bg-[#DBFFE2]`}
+            >
+              <div className="inline-flex items-center justify-start">
+                <div
+                  className={`w-[1.5rem] absolute left-1 h-[1.5rem] bg-[#00BA34] rounded-full`}
+                >
+                  <BiBowlRice className="text-white ml-1 mt-1" />
+                </div>
+                <div className="mb-[0.1rem] font-[500] text-lg text-[#00BA34]/80 pr-1 pl-1 ml-6 mr-4">
+                  Delivered x 1
+                </div>
+              </div>
+            </button>
+          </div>
+        </div>
+        <div className="border-dashed border-b mx-4"></div>
+        <div>
+          <div className="flex justify-between mx-4 mt-4">
+            <div className="w-[10%] font-[500]">11 x</div>
+            <div className="w-[60%] -ml-4 font-[500]">
+              Chicken Peri Sandwich With Extra Sauce
+              <div className="capitalize font-normal text-[#002D4B]/40 text-[0.875rem] mt-1 leading-[1rem]">
+                sankalesh ashok harak sasa kiasajs
+              </div>
+              <div className="capitalize font-normal text-[#002D4B]/40 text-[0.875rem] mt-1 leading-[1rem]">
+                Harak
+              </div>
+            </div>
+            <div className="w-[15%] text-right text-md font-[500] text-[#2C62F0]">
+              Status
+            </div>
+          </div>
+          <div className="py-4 mx-4">
+            <button
+              className={`font-normal relative px-2 text-black rounded-full bg-[#DBFFE2]`}
+            >
+              <div className="inline-flex items-center justify-start">
+                <div
+                  className={`w-[1.5rem] absolute left-1 h-[1.5rem] bg-[#00BA34] rounded-full`}
+                >
+                  <BiBowlRice className="text-white ml-1 mt-1" />
+                </div>
+                <div className="mb-[0.1rem] font-[500] text-lg text-[#00BA34]/80 pr-1 pl-1 ml-6 mr-4">
+                  Delivered x 1
+                </div>
+              </div>
+            </button>
+          </div>
+        </div>
       </div>
       <Footer />
     </div>
