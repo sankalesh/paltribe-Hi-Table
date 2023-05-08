@@ -4,18 +4,18 @@ import React, { useState } from "react";
 import { MdAlarm } from "react-icons/md";
 import { TbToolsKitchen2 } from "react-icons/tb";
 import { SiGoogleassistant } from "react-icons/si";
-import {MdOutlineDinnerDining ,MdOutlinePeopleOutline} from "react-icons/md";
+import { MdOutlineDinnerDining, MdOutlinePeopleOutline } from "react-icons/md";
 import Footer from "@/components/atoms/footer";
 import { HiSearch, HiX } from "react-icons/hi";
 
-type Zone = {
+interface IZone  {
   zoneName: string;
-  zoneCapacity: string;
-  tableOccupied: string;
+  zoneCapacity: number;
+  tableOccupied: number;
   status: string;
 };
 
-const zones = [
+const zones : IZone[]= [
   {
     zoneName: "platinum fjwnhv wnv hwivwvn vwhvhwbviw v",
     zoneCapacity: 10,
@@ -162,18 +162,29 @@ const zones = [
     status: "reserved",
   },
 ];
+const filterButtons = [
+  {
+    name: "occupied",
+    Icon: MdAlarm,
+    text: "Occupied",
+  },
+  {
+    name: "Empty",
+    Icon: TbToolsKitchen2,
+    text: "Empty",
+  },
+  {
+    name: "Need Assistance",
+    Icon: SiGoogleassistant,
+    text: "Assistant",
+  },
+];
 
 function Table() {
-  const [zoneData, setZoneData] = useState(zones);
-  const [filterClicked, setFilterClicked] = useState(false);
+  const [zoneData, setZoneData] = useState<IZone[]>(zones);
   const [search, setSearch] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
-
-  // const buttonProps = {
-  //   onClick: () => {
-  //     console.log("u clicked the button");
-  //   },
-  // };
+  const [activeButton, setActiveButton] = useState("");
 
   const popOver = (search = "") => {
     if (search.length > 0) {
@@ -191,37 +202,18 @@ function Table() {
   };
 
   const handleOnclick = (str: any) => {
-    if (str.toLowerCase() === "occupied") {
-      if (filterClicked) {
-        setZoneData(zones);
-        setFilterClicked(false);
-      } else {
-        setZoneData(
-          zones.filter((ele) => ele.status.toLowerCase() === "occupied")
-        );
-        setFilterClicked(true);
-      }
-    } else if (str.toLowerCase() === "empty") {
-      if (filterClicked) {
-        setZoneData(zones);
-        setFilterClicked(false);
-      } else {
-        setZoneData(
-          zones.filter((ele) => ele.status.toLowerCase() === "empty")
-        );
-        setFilterClicked(true);
-      }
-    } else if (str.toLowerCase() === "need assistance") {
-      if (filterClicked) {
-        setZoneData(zones);
-        setFilterClicked(false);
-      } else {
-        setZoneData(
-          zones.filter((ele) => ele.status.toLowerCase() === "need assistance")
-        );
-        setFilterClicked(true);
-      }
+    str = activeButton.length === 0 ? str : "";
+    setActiveButton(str);
+
+     if (str.length > 0) {
+      setZoneData(
+        zones.filter(
+          (ele) => ele.status.toLowerCase() === str.toLowerCase()
+        )
+      );
+      return;
     }
+    setZoneData(zones);
   };
 
   const classByStatus = {
@@ -324,24 +316,27 @@ function Table() {
             searchOpen ? "hidden" : ""
           } sticky flex justify-between pb-6 mx-6 mt-6`}
         >
-          <HeaderButton onClick={() => handleOnclick("Occupied")}>
-            <MdAlarm className="mt-1 mr-1 -ml-1 text-[#2C62F0]" />
-            Occupied
-          </HeaderButton>
-          <HeaderButton onClick={() => handleOnclick("Empty")}>
-            <TbToolsKitchen2 className="mt-1 mr-1 -ml-1 text-[#2C62F0]" />
-            Empty
-          </HeaderButton>
-          <HeaderButton onClick={() => handleOnclick("Need Assistance")}>
-            <SiGoogleassistant className="mt-1 mr-1 -ml-1 text-[#2C62F0]" />
-            Assistant
-          </HeaderButton>
+          {filterButtons.map(({ name, Icon, text }, index) => (
+            
+            <HeaderButton
+              onClick={() => handleOnclick(name)}
+              key={index}
+              className={
+                activeButton === name
+                  ? "bg-blue-500 focus:font-[500] focus:rounded-full focus:text-[#2C62F0] focus:bg-[#2C62F0]/10 "
+                  : ""
+              }
+            >
+              <Icon className="mt-1 mr-1 -ml-1 text-[#2C62F0]" />
+              {text}
+            </HeaderButton>
+          ))}
         </div>
       </div>
       <div className="mb-[4rem]">
         {searchData.length > 0 ? (
           <div>
-            {searchData.map((ele: any, index) => (
+            {searchData.map((ele, index) => (
               <div
                 key={index}
                 className={`${
