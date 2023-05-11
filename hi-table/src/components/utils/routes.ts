@@ -9,7 +9,8 @@ const withBusinessId = (businessId: string, route: string) =>
     ZONES:'zones',
     TABLES:'tables',
     ALERT:'alert',
-    STATUS:'status'
+    STATUS:'status',
+    ORDER :'orders'
   }
 
   export const routePaths = {
@@ -17,4 +18,7 @@ const withBusinessId = (businessId: string, route: string) =>
     [PAGE_TYPES.ZONES]:(businessId:string)=> withBusinessId(businessId, "/zones"),
     [PAGE_TYPES.TABLES]:(businessId:string)=> withBusinessId(businessId, "/tables"),
     [PAGE_TYPES.ALERT]:(businessId:string)=> withBusinessId(businessId, "/alert"),
+    [PAGE_TYPES.STATUS]:(businessId:string)=> withBusinessId(businessId, "/status"),
+    [PAGE_TYPES.ORDER]:(businessId:string)=> withBusinessId(businessId, "/orders"),
+
   }

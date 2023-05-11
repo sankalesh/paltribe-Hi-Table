@@ -70,7 +70,7 @@ function Status() {
   };
 
   return (
-    <div className="bg-[#f5f5f5] pb-6 relative">
+    <div className="bg-[#f5f5f5] min-h-screen pb-6 relative">
       <Header />
       <div className="sticky top-0 z-50 bg-[#f5f5f5]">
         <div className="flex justify-between">

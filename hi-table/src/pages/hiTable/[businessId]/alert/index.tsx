@@ -192,7 +192,7 @@ function Alert() {
   console.log(historyData);
 
   return (
-    <div className={` bg-[#f5f5f5]  pb-20 relative`}>
+    <div className={` bg-[#f5f5f5] min-h-screen pb-20 relative`}>
       <Header />
       <div className="sticky top-0 z-50 bg-[#f5f5f5]">
         <div className="flex justify-between pb-6">

@@ -1,6 +1,6 @@
 import HeaderButton from "@/components/atoms/buttons/headerButton";
 import Header from "@/components/molecules/header";
-import React, { useState } from "react";
+import React, { useState,useRef,useEffect  } from "react";
 import { MdAlarm } from "react-icons/md";
 import { TbToolsKitchen2 } from "react-icons/tb";
 import { SiGoogleassistant } from "react-icons/si";
@@ -185,6 +185,7 @@ function Table() {
   const [search, setSearch] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [activeButton, setActiveButton] = useState("");
+  const searchRef = useRef(null);
 
   const popOver = (search = "") => {
     if (search.length > 0) {
@@ -215,6 +216,22 @@ function Table() {
     }
     setZoneData(zones);
   };
+
+  // const handleClickOutside = (event:any) => {
+  //   if (!searchRef?.current?.contains(event.target)) {
+  //     console.log("this is search ref", !searchRef?.current?.contains(event.target));
+  //     // setSearchOpen(false);
+  //     // setSearch("");
+  //     document?.activeElement?.blur(); // hides the keyboard on mobile devices
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   window.addEventListener("scroll", handleClickOutside);
+  //   return () => {
+  //     window.removeEventListener("scroll", handleClickOutside);
+  //   };
+  // }, []);
 
   const classByStatus = {
     occupied: {
@@ -270,7 +287,7 @@ function Table() {
   );
 
   return (
-    <div className="bg-[#f5f5f5] pb-6 relative">
+    <div className="bg-[#f5f5f5] pb-6 min-h-screen relative">
       <Header />
       <div className="sticky top-0 z-50 bg-[#f5f5f5]">
         <div className="flex justify-between">
@@ -281,7 +298,8 @@ function Table() {
           >
             Platinum
           </div>
-          <div
+          <div 
+          ref={searchRef}
             onClick={searchClick}
             className={`${
               searchOpen ? "w-[100%] mb-6" : "w-[30%] disabled"
