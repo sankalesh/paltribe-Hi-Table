@@ -9,10 +9,10 @@ import Footer from "@/components/atoms/footer";
 import { HiSearch, HiX } from "react-icons/hi";
 
 interface IZone  {
-  zoneName: string;
-  zoneCapacity: number;
-  tableOccupied: number;
-  status: string;
+  zoneName?: string;
+  zoneCapacity?: number;
+  tableOccupied?: number;
+  status?: string;
 };
 
 const zones : IZone[]= [
@@ -208,7 +208,7 @@ function Table() {
      if (str.length > 0) {
       setZoneData(
         zones.filter(
-          (ele) => ele.status.toLowerCase() === str.toLowerCase()
+          (ele) => ele?.status?.toLowerCase() === str?.toLowerCase()
         )
       );
       return;
@@ -340,24 +340,24 @@ function Table() {
               <div
                 key={index}
                 className={`${
-                  classByStatus[ele?.status.toLowerCase()]?.classNames
+                  classByStatus[ele?.status?.toLowerCase()]?.classNames
                 }`}
               >
                 <div
                   className={`${
-                    classByStatus[ele?.status.toLowerCase()].businessNameClasses
+                    classByStatus[ele?.status?.toLowerCase()].businessNameClasses
                   }`}
                 >
                   {ele.zoneName}
                 </div>
                 <MdOutlinePeopleOutline
                   className={`${
-                    classByStatus[ele?.status.toLowerCase()].tableClasses
+                    classByStatus[ele?.status?.toLowerCase()].tableClasses
                   }`}
                 />
                 <div
                   className={`${
-                    classByStatus[ele?.status.toLowerCase()].numberClasses
+                    classByStatus[ele?.status?.toLowerCase()].numberClasses
                   }`}
                 >
                   {ele?.tableOccupied < 10
@@ -370,8 +370,8 @@ function Table() {
                     ? `0${ele?.zoneCapacity}`
                     : ele?.zoneCapacity}
                 </div>
-                {ele.status.toLowerCase() !== "empty" &&
-                  ele.status.toLowerCase() !== "reserved" && (
+                {ele?.status?.toLowerCase() !== "empty" &&
+                  ele?.status?.toLowerCase() !== "reserved" && (
                     <div>
                       <div className="absolute top-3 left-6 text-sm font-[500] text-[#2C62F0]">
                         10:00
@@ -382,8 +382,8 @@ function Table() {
                   {ele.status}
                 </div>
 
-                {ele.status.toLowerCase() !== "empty" &&
-                  ele.status.toLowerCase() !== "reserved" && (
+                {ele?.status?.toLowerCase() !== "empty" &&
+                  ele?.status?.toLowerCase() !== "reserved" && (
                     <div>
                       <MdOutlineDinnerDining
                         className={`right-[5.5rem] top-6 absolute text-[1rem] opacity-50`}
@@ -416,24 +416,24 @@ function Table() {
               <div
                 key={index}
                 className={`${
-                  classByStatus[ele?.status.toLowerCase()]?.classNames
+                  classByStatus[ele?.status?.toLowerCase()]?.classNames
                 }`}
               >
                 <div
                   className={`${
-                    classByStatus[ele?.status.toLowerCase()].businessNameClasses
+                    classByStatus[ele?.statu?.toLowerCase()].businessNameClasses
                   }`}
                 >
                   {ele.zoneName}
                 </div>
                 <MdOutlinePeopleOutline
                   className={`${
-                    classByStatus[ele?.status.toLowerCase()].tableClasses
+                    classByStatus[ele?.status?.toLowerCase()].tableClasses
                   }`}
                 />
                 <div
                   className={`${
-                    classByStatus[ele?.status.toLowerCase()].numberClasses
+                    classByStatus[ele?.status?.toLowerCase()].numberClasses
                   }`}
                 >
                   {ele?.tableOccupied < 10

@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
-import HiTableLogo from "../assets/svg/HiTableLogo.svg";
-import welcome from "../assets/svg/welcomeLogo.svg";
+import HiTableLogo from "../../../../assets/svg/HiTableLogo.svg";
+import welcome from "../../../../assets/svg/welcomeLogo.svg";
 import { isEmpty } from 'lodash-es'
 
 import Image from "next/image";
 import { useLogin } from "@/components/store/useLogin";
 import axios from "axios";
+import { useRouter } from "next/router";
+import { PAGE_TYPES, routePaths } from "@/components/utils/routes";
 
 function HiTable() {
   const {
@@ -17,9 +19,13 @@ function HiTable() {
     setName,
     setBusinessName,
     setPassword,
+    userDetails,
   } = useLogin();
 
+  console.log(userDetails)
 
+const router = useRouter();
+const businessId = userDetails?.customRole?.[0].businessId
 
   const handlePhoneNumberChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -65,12 +71,10 @@ function HiTable() {
   
       if (!isEmpty(res)) {
         setUserDetails(res)
-      } else {
-        // show alert message if response is empty
-        alert("Phone or Password invalid...!")
       }
-    } catch (err) {
-      if (err.response && err.response.status === 400) {
+      router.push(`${routePaths[PAGE_TYPES.ZONES](`${businessId}`)}`)
+    } catch (err:any) {
+      if (err?.response && err?.response?.status === 400) {
         // show alert message if status code is 400
         alert("Phone or Password invalid...!")
       } else {
