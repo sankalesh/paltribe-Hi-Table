@@ -6,8 +6,8 @@ const withBusinessId = (businessId: string, route: string) =>
 
   export const PAGE_TYPES = {
     LOGIN: "Login",
-    ZONES:'zones',
-    TABLES:'tables',
+    ZONE:'zones',
+    ALL_TABLES:'tables',
     ALERT:'alert',
     STATUS:'status',
     ORDER :'orders'
@@ -15,8 +15,8 @@ const withBusinessId = (businessId: string, route: string) =>
 
   export const routePaths = {
     [PAGE_TYPES.LOGIN]:(businessId:string)=> withBusinessId(businessId, "/login"),
-    [PAGE_TYPES.ZONES]:(businessId:string)=> withBusinessId(businessId, "/zones"),
-    [PAGE_TYPES.TABLES]:(businessId:string)=> withBusinessId(businessId, "/tables"),
+    [PAGE_TYPES.ZONE]:(businessId:string)=> withBusinessId(businessId, "/zones"),
+    [PAGE_TYPES.ALL_TABLES]:(businessId:string,zoneId:string)=> withBusinessId(businessId, `/zone/${zoneId}`),
     [PAGE_TYPES.ALERT]:(businessId:string)=> withBusinessId(businessId, "/alert"),
     [PAGE_TYPES.STATUS]:(businessId:string)=> withBusinessId(businessId, "/status"),
     [PAGE_TYPES.ORDER]:(businessId:string)=> withBusinessId(businessId, "/orders"),

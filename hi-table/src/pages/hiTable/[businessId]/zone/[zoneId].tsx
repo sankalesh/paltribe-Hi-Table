@@ -7,161 +7,24 @@ import { SiGoogleassistant } from "react-icons/si";
 import { MdOutlineDinnerDining, MdOutlinePeopleOutline } from "react-icons/md";
 import Footer from "@/components/atoms/footer";
 import { HiSearch, HiX } from "react-icons/hi";
+import { useRouter } from "next/router";
+import axios from "axios";
 
-interface IZone  {
-  zoneName?: string;
-  zoneCapacity?: number;
-  tableOccupied?: number;
-  status?: string;
-};
+interface IZone {
+    businessId: string;
+    zoneId: string;
+    name: string;
+    capacity: number;
+    staff: string[];
+    status: string;
+    activeUser: number;
+    time: string;
+    totalDishQuantity: number;
+    deliverdDish: number;
+    id: string;
+  }
 
-const zones : IZone[]= [
-  {
-    zoneName: "platinum fjwnhv wnv hwivwvn vwhvhwbviw v",
-    zoneCapacity: 10,
-    tableOccupied: 7,
-    status: "Occupied",
-  },
-  {
-    zoneName: "Gold",
-    zoneCapacity: 22,
-    tableOccupied: 18,
-    status: "Settled",
-  },
-  {
-    zoneName: "Titanium",
-    zoneCapacity: 20,
-    status: "Empty",
-  },
-  {
-    zoneName: "Balcony",
-    zoneCapacity: 20,
-    tableOccupied: 7,
-    status: "Need Assistance",
-  },
-  {
-    zoneName: "Balcony",
-    zoneCapacity: 20,
-    tableOccupied: 7,
-    status: "reserved",
-  },
-  {
-    zoneName: "platinum fjwnhv wnv hwivwvn vwhvhwbviw v",
-    zoneCapacity: 10,
-    tableOccupied: 7,
-    status: "Occupied",
-  },
-  {
-    zoneName: "Gold",
-    zoneCapacity: 22,
-    tableOccupied: 18,
-    status: "Settled",
-  },
-  {
-    zoneName: "Titanium",
-    zoneCapacity: 20,
-    status: "Empty",
-  },
-  {
-    zoneName: "Balcony",
-    zoneCapacity: 20,
-    tableOccupied: 7,
-    status: "Need Assistance",
-  },
-  {
-    zoneName: "Balcony",
-    zoneCapacity: 20,
-    tableOccupied: 7,
-    status: "reserved",
-  },
-  {
-    zoneName: "platinum fjwnhv wnv hwivwvn vwhvhwbviw v",
-    zoneCapacity: 10,
-    tableOccupied: 7,
-    status: "Occupied",
-  },
-  {
-    zoneName: "Gold",
-    zoneCapacity: 22,
-    tableOccupied: 18,
-    status: "Settled",
-  },
-  {
-    zoneName: "Titanium",
-    zoneCapacity: 20,
-    status: "Empty",
-  },
-  {
-    zoneName: "Balcony",
-    zoneCapacity: 20,
-    tableOccupied: 7,
-    status: "Need Assistance",
-  },
-  {
-    zoneName: "Balcony",
-    zoneCapacity: 20,
-    tableOccupied: 7,
-    status: "reserved",
-  },
-  {
-    zoneName: "platinum fjwnhv wnv hwivwvn vwhvhwbviw v",
-    zoneCapacity: 10,
-    tableOccupied: 7,
-    status: "Occupied",
-  },
-  {
-    zoneName: "Gold",
-    zoneCapacity: 22,
-    tableOccupied: 18,
-    status: "Settled",
-  },
-  {
-    zoneName: "Titanium",
-    zoneCapacity: 20,
-    status: "Empty",
-  },
-  {
-    zoneName: "Balcony",
-    zoneCapacity: 20,
-    tableOccupied: 7,
-    status: "Need Assistance",
-  },
-  {
-    zoneName: "Balcony",
-    zoneCapacity: 20,
-    tableOccupied: 7,
-    status: "reserved",
-  },
-  {
-    zoneName: "platinum fjwnhv wnv hwivwvn vwhvhwbviw v",
-    zoneCapacity: 10,
-    tableOccupied: 7,
-    status: "Occupied",
-  },
-  {
-    zoneName: "Gold",
-    zoneCapacity: 22,
-    tableOccupied: 18,
-    status: "Settled",
-  },
-  {
-    zoneName: "Titanium",
-    zoneCapacity: 20,
-    status: "Empty",
-  },
-  {
-    zoneName: "Balcony",
-    zoneCapacity: 20,
-    tableOccupied: 7,
-    status: "Need Assistance",
-  },
-  {
-    zoneName: "Balcony",
-    zoneCapacity: 20,
-    tableOccupied: 7,
-    status: "reserved",
-  },
-];
+
 const filterButtons = [
   {
     name: "occupied",
@@ -181,11 +44,17 @@ const filterButtons = [
 ];
 
 function Table() {
-  const [zoneData, setZoneData] = useState<IZone[]>(zones);
+  const [zoneData, setZoneData] = useState<IZone[]>([]);
   const [search, setSearch] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [activeButton, setActiveButton] = useState("");
   const searchRef = useRef(null);
+
+  
+const router = useRouter()
+
+const{businessId,zoneId} = router.query as {businessId:string,zoneId:string}
+console.log(businessId,zoneId)
 
   const popOver = (search = "") => {
     if (search.length > 0) {
@@ -208,13 +77,13 @@ function Table() {
 
      if (str.length > 0) {
       setZoneData(
-        zones.filter(
+        zoneData.filter(
           (ele) => ele?.status?.toLowerCase() === str?.toLowerCase()
         )
       );
       return;
     }
-    setZoneData(zones);
+    setZoneData(zoneData);
   };
 
   // const handleClickOutside = (event:any) => {
@@ -232,6 +101,16 @@ function Table() {
   //     window.removeEventListener("scroll", handleClickOutside);
   //   };
   // }, []);
+  useEffect(()=>{
+    result()
+  },[])
+
+    const result = async () => {
+      const response = await axios.get(`https://api.hipal.life/v1/zones/${zoneId}/tables?businessId=${businessId}`)
+      const res = response.data
+      setZoneData(res)
+      console.log(res)
+    }
 
   const classByStatus = {
     occupied: {
@@ -280,9 +159,9 @@ function Table() {
         "absolute right-6 bottom-6 text-sm font-[500] text-[#2C62F0]",
     },
   };
-  const searchData = zoneData.filter(
+  const searchData:IZone[] = zoneData.filter(
     (ele) =>
-      ele?.zoneName?.toLowerCase()?.includes(search?.toLowerCase()) ||
+      ele?.name?.toLowerCase()?.includes(search?.toLowerCase()) ||
       ele?.status?.toLowerCase()?.includes(search?.toLowerCase())
   );
 
@@ -363,14 +242,14 @@ function Table() {
               >
                 <div
                   className={`${
-                    classByStatus[ele?.status?.toLowerCase()].businessNameClasses
+                    classByStatus[ele?.status?.toLowerCase()]?.businessNameClasses
                   }`}
                 >
-                  {ele.zoneName}
+                  {ele.name}
                 </div>
                 <MdOutlinePeopleOutline
                   className={`${
-                    classByStatus[ele?.status?.toLowerCase()].tableClasses
+                    classByStatus[ele?.status?.toLowerCase()]?.tableClasses
                   }`}
                 />
                 <div
@@ -378,21 +257,21 @@ function Table() {
                     classByStatus[ele?.status?.toLowerCase()].numberClasses
                   }`}
                 >
-                  {ele?.tableOccupied < 10
-                    ? `0${ele?.tableOccupied}`
-                    : ele?.tableOccupied == null
+                  {ele?.activeUser < 10
+                    ? `0${ele?.activeUser}`
+                    : ele?.activeUser == null
                     ? "00"
-                    : ele?.tableOccupied}
+                    : ele?.activeUser}
                   /
-                  {ele?.zoneCapacity < 10
-                    ? `0${ele?.zoneCapacity}`
-                    : ele?.zoneCapacity}
+                  {ele?.capacity < 10
+                    ? `0${ele?.capacity}`
+                    : ele?.capacity}
                 </div>
                 {ele?.status?.toLowerCase() !== "empty" &&
                   ele?.status?.toLowerCase() !== "reserved" && (
                     <div>
                       <div className="absolute top-3 left-6 text-sm font-[500] text-[#2C62F0]">
-                        10:00
+                            {ele?.time}
                       </div>
                     </div>
                   )}
@@ -409,15 +288,15 @@ function Table() {
                       <div
                         className={`absolute right-20 bottom-6 text-sm font-[500] text-[#2C62F0]`}
                       >
-                        {ele?.tableOccupied < 10
-                          ? `0${ele?.tableOccupied}`
-                          : ele?.tableOccupied == null
+                        {ele?.activeUser < 10
+                          ? `0${ele?.activeUser}`
+                          : ele?.activeUser == null
                           ? "00"
-                          : ele?.tableOccupied}
+                          : ele?.activeUser}
                         /
-                        {ele?.zoneCapacity < 10
-                          ? `0${ele?.zoneCapacity}`
-                          : ele?.zoneCapacity}
+                        {ele?.capacity < 10
+                          ? `0${ele?.capacity}`
+                          : ele?.capacity}
                       </div>
                     </div>
                   )}
@@ -430,7 +309,7 @@ function Table() {
           </div>
         ) : (
           <div>
-            {zoneData.map((ele: any, index) => (
+            {zoneData.map((ele, index) => (
               <div
                 key={index}
                 className={`${
@@ -439,33 +318,33 @@ function Table() {
               >
                 <div
                   className={`${
-                    classByStatus[ele?.statu?.toLowerCase()].businessNameClasses
+                    classByStatus[ele?.status?.toLowerCase()]?.businessNameClasses
                   }`}
                 >
-                  {ele.zoneName}
+                  {ele.name}
                 </div>
                 <MdOutlinePeopleOutline
                   className={`${
-                    classByStatus[ele?.status?.toLowerCase()].tableClasses
+                    classByStatus[ele?.status?.toLowerCase()]?.tableClasses
                   }`}
                 />
                 <div
                   className={`${
-                    classByStatus[ele?.status?.toLowerCase()].numberClasses
+                    classByStatus[ele?.status?.toLowerCase()]?.numberClasses
                   }`}
                 >
-                  {ele?.tableOccupied < 10
-                    ? `0${ele?.tableOccupied}`
-                    : ele?.tableOccupied == null
+                  {ele?.activeUser < 10
+                    ? `0${ele?.activeUser}`
+                    : ele?.activeUser == null
                     ? "00"
-                    : ele?.tableOccupied}
+                    : ele?.activeUser}
                   /
-                  {ele?.zoneCapacity < 10
-                    ? `0${ele?.zoneCapacity}`
-                    : ele?.zoneCapacity}
+                  {ele?.capacity < 10
+                    ? `0${ele?.capacity}`
+                    : ele?.capacity}
                 </div>
-                {ele.status.toLowerCase() !== "empty" &&
-                  ele.status.toLowerCase() !== "reserved" && (
+                {ele?.status.toLowerCase() !== "empty" &&
+                  ele?.status.toLowerCase() !== "reserved" && (
                     <div>
                       <div className="absolute top-3 left-6 text-sm font-[500] text-[#2C62F0]">
                         10:00
@@ -473,11 +352,11 @@ function Table() {
                     </div>
                   )}
                 <div className="absolute bottom-2 left-6 capitalize font-semibold text-[#002D4B]/40 text-[0.875rem] leading-[1rem]">
-                  {ele.status}
+                  {ele?.status}
                 </div>
 
-                {ele.status.toLowerCase() !== "empty" &&
-                  ele.status.toLowerCase() !== "reserved" && (
+                {ele?.status.toLowerCase() !== "empty" &&
+                  ele?.status.toLowerCase() !== "reserved" && (
                     <div>
                       <MdOutlineDinnerDining
                         className={`right-[5.5rem] top-6 absolute text-[1rem] opacity-50`}
@@ -485,15 +364,15 @@ function Table() {
                       <div
                         className={`absolute right-20 bottom-6 text-sm font-[500] text-[#2C62F0]`}
                       >
-                        {ele?.tableOccupied < 10
-                          ? `0${ele?.tableOccupied}`
-                          : ele?.tableOccupied == null
+                        {ele?.activeUser < 10
+                          ? `0${ele?.activeUser}`
+                          : ele?.activeUser == null
                           ? "00"
-                          : ele?.tableOccupied}
+                          : ele?.activeUser}
                         /
-                        {ele?.zoneCapacity < 10
-                          ? `0${ele?.zoneCapacity}`
-                          : ele?.zoneCapacity}
+                        {ele?.capacity < 10
+                          ? `0${ele?.capacity}`
+                          : ele?.capacity}
                       </div>
                     </div>
                   )}

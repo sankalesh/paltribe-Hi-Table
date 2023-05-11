@@ -6,6 +6,8 @@ import { useLogin } from "@/components/store/useLogin";
 import moment from "moment";
 import axios from "axios";
 import { useRouter } from "next/router";
+import Link from "next/link";
+import { PAGE_TYPES, routePaths } from "@/components/utils/routes";
 
 interface IZone {
   businessId: string;
@@ -25,8 +27,7 @@ function Zones() {
   const [isToggled, setIsToggled] = useState(false);
   const { time, setTime } = useLogin();
   const router = useRouter();
-  const { businessId } = router.query;
-  console.log(businessId);
+  const { businessId } = router.query as {businessId: string}
 
   const handleToggle = () => {
     setIsToggled(!isToggled);
@@ -34,21 +35,7 @@ function Zones() {
     setTime(currTime);
   };
 
-  const handleOnClick = async (zoneId: string) => {
-    try {
-      const response = await axios.get(
-        `https://api.hipal.life/v1/zones/${zoneId}/tables?businessId=${businessId}`
-      );
-      const tables = response.data;
-    if (tables.length > 0) {
-      router.push(`/hiTable/${businessId}/tables`);
-    } else {
-      alert('no tables found');
-    }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  
   
   useEffect(() => {
     if (businessId) {
@@ -135,9 +122,10 @@ function Zones() {
       </span>
 
       {zones?.map((ele, index) => (
+          
+          <Link key={index} href={`${routePaths.tables(businessId,ele.id)}`} passHref>
         <div
-          onClick={() => handleOnClick(ele?.id)}
-          key={index}
+          
           className={`relative h-[5.75rem] mx-6 my-4 border border-[#e1e1e1]/50 rounded-xl ${
             isToggled ? "bg-white" : "bg-gray-200"
           }`}
@@ -167,6 +155,7 @@ function Zones() {
               : ele?.tables?.length}
           </div>
         </div>
+      </Link>
       ))}
     </div>
   );

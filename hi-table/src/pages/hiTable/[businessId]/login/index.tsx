@@ -72,7 +72,7 @@ const businessId = userDetails?.customRole?.[0].businessId
       if (!isEmpty(res)) {
         setUserDetails(res)
       }
-      router.push(`${routePaths[PAGE_TYPES.ZONES](`${businessId}`)}`)
+      router.push(`${routePaths[PAGE_TYPES.ZONE](`${businessId}`)}`)
     } catch (err:any) {
       if (err?.response && err?.response?.status === 400) {
         // show alert message if status code is 400
