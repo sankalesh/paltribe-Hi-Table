@@ -4,14 +4,28 @@ import React, { useState } from "react";
 import { MdAlarm } from "react-icons/md";
 import { TbToolsKitchen2 } from "react-icons/tb";
 import { SiGoogleassistant } from "react-icons/si";
-import Footer from "@/components/atoms/footer";
+import Footer from "@/components/molecules/footer";
 import { HiSearch, HiX } from "react-icons/hi";
 import { BiBowlRice } from "react-icons/bi";
+import Modal from "@/components/molecules/popup";
+import Popup from "@/components/molecules/popup";
+import HiPalLogo from "../../../../assets/svg/hipalLogoNew.svg";
+import Image from "next/image";
+
 
 function Status() {
   const [filterClicked, setFilterClicked] = useState(false);
   const [search, setSearch] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
 
   // const buttonProps = {
   //   onClick: () => {
@@ -71,7 +85,15 @@ function Status() {
 
   return (
     <div className="bg-[#f5f5f5] min-h-screen pb-6 relative">
-      <Header />
+      <Header>
+        <Image
+          className="mr-6"
+          width={68}
+          height={25}
+          src={HiPalLogo}
+          alt="Hi Table Logo"
+        />
+      </Header>
       <div className="sticky top-0 z-50 bg-[#f5f5f5]">
         <div className="flex justify-between">
           <div
@@ -134,7 +156,7 @@ function Status() {
       </div>
 
       <div className="bg-white mx-6 rounded-2xl mt-6 mb-[5rem]">
-        <div className="flex justify-between mx-4 pt-4">
+        <div className="flex justify-between pt-4 mx-4">
           <div className="flex flex-col">
             <div className="font-[500] capitalize">T-21</div>
             <div className="capitalize font-normal text-[#002D4B]/40 text-[0.875rem] mt-1 leading-[1rem]">
@@ -150,7 +172,7 @@ function Status() {
             </div>
           </div>
         </div>
-        <div className="mx-4 border-2 border-gray-400/50 rounded-full mt-4"></div>
+        <div className="mx-4 mt-4 border-2 rounded-full border-gray-400/50"></div>
         <div>
           <div className="flex justify-between mx-4 mt-4">
             <div className="w-[10%] font-[500]">11 x</div>
@@ -163,9 +185,21 @@ function Status() {
                 Harak
               </div>
             </div>
-            <div className="w-[15%] text-right text-md font-[500] text-[#2C62F0]">
+            <div
+              className="w-[15%] text-right text-md font-[500] text-[#2C62F0] "
+              onClick={openModal}
+            >
               Status
             </div>
+            <Popup show={isModalOpen} onClose={closeModal}>
+              <div className="relative">
+                <div className="capitalize font-[500] ml-6 mt-4 text-[#002D4B] text-[1rem] leading-[1.25rem]">
+                  T-001
+                </div>
+                <div className="mt-4 border border-b-dashed"></div>
+                
+              </div>
+            </Popup>
           </div>
           <div className="py-4 mx-4">
             <button
@@ -175,7 +209,7 @@ function Status() {
                 <div
                   className={`w-[1.5rem] absolute left-1 h-[1.5rem] bg-[#00BA34] rounded-full`}
                 >
-                  <BiBowlRice className="text-white ml-1 mt-1" />
+                  <BiBowlRice className="mt-1 ml-1 text-white" />
                 </div>
                 <div className="mb-[0.1rem] font-[500] text-lg text-[#00BA34]/80 pr-1 pl-1 ml-6 mr-4">
                   Delivered x 1
@@ -184,7 +218,7 @@ function Status() {
             </button>
           </div>
         </div>
-        <div className="border-dashed border-b mx-4"></div>
+        <div className="mx-4 border-b border-dashed"></div>
         <div>
           <div className="flex justify-between mx-4 mt-4">
             <div className="w-[10%] font-[500]">11 x</div>
@@ -209,7 +243,7 @@ function Status() {
                 <div
                   className={`w-[1.5rem] absolute left-1 h-[1.5rem] bg-[#00BA34] rounded-full`}
                 >
-                  <BiBowlRice className="text-white ml-1 mt-1" />
+                  <BiBowlRice className="mt-1 ml-1 text-white" />
                 </div>
                 <div className="mb-[0.1rem] font-[500] text-lg text-[#00BA34]/80 pr-1 pl-1 ml-6 mr-4">
                   Delivered x 1

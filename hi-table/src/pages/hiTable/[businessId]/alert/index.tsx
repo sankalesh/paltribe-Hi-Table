@@ -1,5 +1,5 @@
 import HeaderButton from "@/components/atoms/buttons/headerButton";
-import Footer from "@/components/atoms/footer";
+import Footer from "@/components/molecules/footer";
 import Assistance from "@/components/atoms/status/assistance";
 import Clean from "@/components/atoms/status/clean";
 import Cooked from "@/components/atoms/status/cooked";
@@ -11,6 +11,9 @@ import { MdCreditCard } from "react-icons/md";
 import { SiGoogleassistant } from "react-icons/si";
 import { TbToolsKitchen2 } from "react-icons/tb";
 import { ImStopwatch } from "react-icons/im";
+import Image from "next/image";
+import HiPalLogo from "../../../../assets/svg/hipalLogoNew.svg";
+
 
 const alertData = [
   {
@@ -189,11 +192,18 @@ function Alert() {
       ele.tableName.toLowerCase().includes(search.toLowerCase()) ||
       ele.status.toLowerCase().includes(search.toLowerCase())
   );
-  console.log(historyData);
 
   return (
     <div className={` bg-[#f5f5f5] min-h-screen pb-20 relative`}>
-      <Header />
+      <Header>
+        <Image
+          className="mr-6"
+          width={68}
+          height={25}
+          src={HiPalLogo}
+          alt="Hi Table Logo"
+        />
+      </Header>
       <div className="sticky top-0 z-50 bg-[#f5f5f5]">
         <div className="flex justify-between pb-6">
           <div

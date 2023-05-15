@@ -1,29 +1,31 @@
 import HeaderButton from "@/components/atoms/buttons/headerButton";
 import Header from "@/components/molecules/header";
-import React, { useState,useRef,useEffect  } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { MdAlarm } from "react-icons/md";
 import { TbToolsKitchen2 } from "react-icons/tb";
 import { SiGoogleassistant } from "react-icons/si";
 import { MdOutlineDinnerDining, MdOutlinePeopleOutline } from "react-icons/md";
-import Footer from "@/components/atoms/footer";
+import Footer from "@/components/molecules/footer";
 import { HiSearch, HiX } from "react-icons/hi";
 import { useRouter } from "next/router";
 import axios from "axios";
+import HiPalLogo from "../../../../../assets/svg/hipalLogoNew.svg";
+
+import Image from "next/image";
 
 interface IZone {
-    businessId: string;
-    zoneId: string;
-    name: string;
-    capacity: number;
-    staff: string[];
-    status: string;
-    activeUser: number;
-    time: string;
-    totalDishQuantity: number;
-    deliverdDish: number;
-    id: string;
-  }
-
+  businessId: string;
+  zoneId: string;
+  name: string;
+  capacity: number;
+  staff: string[];
+  status: string;
+  activeUser: number;
+  time: string;
+  totalDishQuantity: number;
+  deliverdDish: number;
+  id: string;
+}
 
 const filterButtons = [
   {
@@ -50,11 +52,13 @@ function Table() {
   const [activeButton, setActiveButton] = useState("");
   const searchRef = useRef(null);
 
-  
-const router = useRouter()
+  const router = useRouter();
 
-const{businessId,zoneId} = router.query as {businessId:string,zoneId:string}
-console.log(businessId,zoneId)
+  const { businessId, zoneId } = router.query as {
+    businessId: string;
+    zoneId: string;
+  };
+  console.log(businessId, zoneId);
 
   const popOver = (search = "") => {
     if (search.length > 0) {
@@ -75,7 +79,7 @@ console.log(businessId,zoneId)
     str = activeButton.length === 0 ? str : "";
     setActiveButton(str);
 
-     if (str.length > 0) {
+    if (str.length > 0) {
       setZoneData(
         zoneData.filter(
           (ele) => ele?.status?.toLowerCase() === str?.toLowerCase()
@@ -101,16 +105,18 @@ console.log(businessId,zoneId)
   //     window.removeEventListener("scroll", handleClickOutside);
   //   };
   // }, []);
-  useEffect(()=>{
-    result()
-  },[])
+  useEffect(() => {
+    result();
+  }, []);
 
-    const result = async () => {
-      const response = await axios.get(`https://api.hipal.life/v1/zones/${zoneId}/tables?businessId=${businessId}`)
-      const res = response.data
-      setZoneData(res)
-      console.log(res)
-    }
+  const result = async () => {
+    const response = await axios.get(
+      `https://api.hipal.life/v1/zones/${zoneId}/tables?businessId=${businessId}`
+    );
+    const res = response.data;
+    setZoneData(res);
+    console.log(res);
+  };
 
   const classByStatus = {
     occupied: {
@@ -159,7 +165,7 @@ console.log(businessId,zoneId)
         "absolute right-6 bottom-6 text-sm font-[500] text-[#2C62F0]",
     },
   };
-  const searchData:IZone[] = zoneData.filter(
+  const searchData: IZone[] = zoneData.filter(
     (ele) =>
       ele?.name?.toLowerCase()?.includes(search?.toLowerCase()) ||
       ele?.status?.toLowerCase()?.includes(search?.toLowerCase())
@@ -167,7 +173,15 @@ console.log(businessId,zoneId)
 
   return (
     <div className="bg-[#f5f5f5] pb-6 min-h-screen relative">
-      <Header />
+      <Header>
+        <Image
+          className="mr-6"
+          width={68}
+          height={25}
+          src={HiPalLogo}
+          alt="Hi Table Logo"
+        />
+      </Header>
       <div className="sticky top-0 z-50 bg-[#f5f5f5]">
         <div className="flex justify-between">
           <div
@@ -177,8 +191,8 @@ console.log(businessId,zoneId)
           >
             Platinum
           </div>
-          <div 
-          ref={searchRef}
+          <div
+            ref={searchRef}
             onClick={searchClick}
             className={`${
               searchOpen ? "w-[100%] mb-6" : "w-[30%] disabled"
@@ -214,7 +228,6 @@ console.log(businessId,zoneId)
           } sticky flex justify-between pb-6 mx-6 mt-6`}
         >
           {filterButtons.map(({ name, Icon, text }, index) => (
-            
             <HeaderButton
               onClick={() => handleOnclick(name)}
               key={index}
@@ -242,7 +255,8 @@ console.log(businessId,zoneId)
               >
                 <div
                   className={`${
-                    classByStatus[ele?.status?.toLowerCase()]?.businessNameClasses
+                    classByStatus[ele?.status?.toLowerCase()]
+                      ?.businessNameClasses
                   }`}
                 >
                   {ele.name}
@@ -262,16 +276,13 @@ console.log(businessId,zoneId)
                     : ele?.activeUser == null
                     ? "00"
                     : ele?.activeUser}
-                  /
-                  {ele?.capacity < 10
-                    ? `0${ele?.capacity}`
-                    : ele?.capacity}
+                  /{ele?.capacity < 10 ? `0${ele?.capacity}` : ele?.capacity}
                 </div>
                 {ele?.status?.toLowerCase() !== "empty" &&
                   ele?.status?.toLowerCase() !== "reserved" && (
                     <div>
                       <div className="absolute top-3 left-6 text-sm font-[500] text-[#2C62F0]">
-                            {ele?.time}
+                        {ele?.time}
                       </div>
                     </div>
                   )}
@@ -318,7 +329,8 @@ console.log(businessId,zoneId)
               >
                 <div
                   className={`${
-                    classByStatus[ele?.status?.toLowerCase()]?.businessNameClasses
+                    classByStatus[ele?.status?.toLowerCase()]
+                      ?.businessNameClasses
                   }`}
                 >
                   {ele.name}
@@ -338,10 +350,7 @@ console.log(businessId,zoneId)
                     : ele?.activeUser == null
                     ? "00"
                     : ele?.activeUser}
-                  /
-                  {ele?.capacity < 10
-                    ? `0${ele?.capacity}`
-                    : ele?.capacity}
+                  /{ele?.capacity < 10 ? `0${ele?.capacity}` : ele?.capacity}
                 </div>
                 {ele?.status.toLowerCase() !== "empty" &&
                   ele?.status.toLowerCase() !== "reserved" && (
