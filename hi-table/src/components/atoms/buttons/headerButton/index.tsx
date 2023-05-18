@@ -14,7 +14,6 @@ interface OnImgButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
 }
 
 function HeaderButton({ children, className, ...props }: OnImgButtonProps) {
-  console.log(className);
   return (
     <button
       className={

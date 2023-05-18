@@ -3,7 +3,7 @@ import Menu from "@/components/organisms/category/childCategory";
 import Header from "@/components/molecules/header";
 import MenuPopup from "@/components/molecules/menuPopup";
 import Popup from "@/components/molecules/popup";
-import React, { useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 import { BiBowlRice } from "react-icons/bi";
 import { HiSearch, HiX } from "react-icons/hi";
 import {
@@ -15,6 +15,11 @@ import { RiCalendarCheckFill } from "react-icons/ri";
 import { RxCross2 } from "react-icons/rx";
 import ChildCategory from "@/components/organisms/category/childCategory";
 import ParentCategory from "@/components/organisms/category/parentCategory";
+import axios from "axios";
+import { useRouter } from "next/router";
+import { IDishData } from "@/components/types/hiTableData";
+import { NextRequest, NextResponse } from "next/server";
+import { set } from "lodash";
 
 const headerButton = [
   {
@@ -36,6 +41,15 @@ function POS() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
+  const [childCategory, setChildCategory] = useState<IDishData[]>([]);
+  const router = useRouter();
+  console.log(activeButton);
+
+  const { businessId } = router.query as { businessId: string };
+
+  useEffect(() => {
+    getAllChildCategories();
+  }, []);
 
   const popOver = (search = "") => {
     if (search.length > 0) {
@@ -54,6 +68,9 @@ function POS() {
 
   const handleOnClick = (str: string) => {
     // str = activeButton.length === 0 ? str : "";
+    if (str.toLowerCase() === "pos") {
+      getAllChildCategories();
+    }
     setActiveButton(str);
   };
 
@@ -64,6 +81,15 @@ function POS() {
   const closeModal = () => {
     setIsModalOpen(false);
   };
+
+  async function getAllChildCategories() {
+    const result = await axios.get(
+      `https://api.hipal.life/v1/categories/get/allChildCategory/?businessId=${businessId}`
+    );
+    const ChildCategories = await result.data.data;
+    console.log('hena bhai')
+    setChildCategory(ChildCategories);
+  }
 
   return (
     <div className="bg-[#f5f5f5] min-h-screen">
@@ -241,7 +267,7 @@ function POS() {
       )}
       {activeButton.toLowerCase() === "pos" && (
         <div className="">
-          <ChildCategory />
+          <ChildCategory childCategories={childCategory} />
           {!isModalOpen ? (
             <div
               onClick={openModal}

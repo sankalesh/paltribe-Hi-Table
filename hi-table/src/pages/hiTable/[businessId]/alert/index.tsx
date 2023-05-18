@@ -5,7 +5,7 @@ import Clean from "@/components/atoms/status/clean";
 import Cooked from "@/components/atoms/status/cooked";
 import Paid from "@/components/atoms/status/paid";
 import Header from "@/components/molecules/header";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { HiSearch, HiX } from "react-icons/hi";
 import { MdCreditCard } from "react-icons/md";
 import { SiGoogleassistant } from "react-icons/si";
@@ -13,101 +13,8 @@ import { TbToolsKitchen2 } from "react-icons/tb";
 import { ImStopwatch } from "react-icons/im";
 import Image from "next/image";
 import HiPalLogo from "../../../../assets/svg/hipalLogoNew.svg";
-
-
-const alertData = [
-  {
-    status: "cooked",
-    tableName: "T 0001",
-    dishName: "chicken peri peri hot spicy juicy chicken",
-    time: "12:12",
-    total: "",
-  },
-  {
-    status: "cooked",
-    tableName: "T 0002",
-    dishName: "chicken peri peri hot spicy juicy chicken",
-    time: "12:12",
-    total: "",
-  },
-  {
-    status: "clean up",
-    tableName: "T 0003",
-    dishName: "chicken peri peri hot spicy juicy chicken",
-    time: "12:12",
-    total: "",
-  },
-  {
-    status: "cooked",
-    tableName: "T 0004",
-    dishName: "chicken peri peri hot spicy juicy chicken",
-    time: "12:12",
-    total: "",
-  },
-  {
-    status: "Assist",
-    tableName: "T 0005",
-    dishName: "chicken peri peri hot spicy juicy chicken",
-    time: "12:12",
-    total: "",
-  },
-  {
-    status: "clean up",
-    tableName: "T 0006",
-    dishName: "chicken peri peri hot spicy juicy chicken",
-    time: "12:12",
-    total: "",
-  },
-  {
-    status: "cooked",
-    tableName: "T 0007",
-    dishName: "chicken peri peri hot spicy juicy chicken",
-    time: "12:12",
-    total: "",
-  },
-  {
-    status: "Assist",
-    tableName: "T 0008",
-    dishName: "chicken peri peri hot spicy juicy chicken",
-    time: "12:12",
-    total: "",
-  },
-  {
-    status: "clean up",
-    tableName: "T 0009",
-    dishName: "chicken peri peri hot spicy juicy chicken",
-    time: "12:12",
-    total: "",
-  },
-  {
-    status: "Assist",
-    tableName: "T 0010",
-    dishName: "chicken peri peri hot spicy juicy chicken",
-    time: "12:12",
-    total: "",
-  },
-  {
-    status: "clean up",
-    tableName: "T 0011",
-    dishName: "chicken peri peri hot spicy juicy chicken",
-    time: "12:12",
-    total: "",
-  },
-  {
-    status: "paid",
-    tableName: "T 0012",
-    dishName: "chicken peri peri hot spicy juicy chicken",
-    time: "12:12",
-    total: "2500",
-  },
-  {
-    status: "paid",
-    tableName: "T 0013",
-    dishName: "chicken peri peri hot spicy juicy chicken",
-    time: "12:12",
-    total: "2500",
-  },
-];
+import { useRouter } from "next/router";
+import axios from "axios";
 
 const filterButtons = [
   {
@@ -127,41 +34,56 @@ const filterButtons = [
   },
 ];
 
-interface IHistory {
-  dishName: string;
-  time: string;
-  status: string;
+interface IAlertData {
+  businessId: string;
   tableName: string;
+  tableId: string;
+  staffId: string;
+  status: string;
+  time: string;
+  message: string;
+  isAlertOn: boolean;
+  id: string;
 }
 
 function Alert() {
-  const [data, setData] = useState(alertData);
+  const [data, setData] = useState<IAlertData[]>([]);
   const [search, setSearch] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
-  const [history, setHistory] = useState<IHistory[]>([]);
   const [showHistory, setShowHistory] = useState(false);
   const [activeButton, setActiveButton] = useState("");
-
-  const handleItemClick = (index: number) => {
-    const item = data[index];
-    setData((prevData) => prevData.filter((ele, i) => i !== index));
-    setHistory((prevHistory) => [...prevHistory, item]);
-  };
+  const router = useRouter();
+  const { businessId } = router.query as { businessId: string };
 
   const handleOnclick = (str: string) => {
     str = activeButton.length === 0 ? str : "";
     setActiveButton(str);
     if (str.length > 0) {
       setData(
-        alertData.filter(
-          (ele) => ele.status.toLowerCase() === str.toLowerCase()
-        )
+        data.filter((ele) => ele.status.toLowerCase() === str.toLowerCase())
       );
       return;
     }
-    setData(alertData);
+    alertData();
   };
+
+  const handleItemClick = (index: number) => {
+    const item = data[index];
+    const updatedData = [...data]; // Create a copy of the data array
+    updatedData[index].isAlertOn = false; // Update the isAlertOn property of the clicked card
+    setData((updatedData) => updatedData.filter((ele, i) => i !== index));
+  };
+
   const historyOnClick = () => {
+    async function alertData() {
+      const response = await axios.get(
+        `https://api.hipal.life/v1/kitchens/get/AllAlertByWaiter?waiterId=5&businessId=${businessId}&isAlertOn=true`
+      );
+      const data = await response.data;
+      console.log(data);
+      setData(data);
+    }
+    alertData();
     setShowHistory(!showHistory);
   };
 
@@ -182,16 +104,22 @@ function Alert() {
 
   const searchData = data.filter(
     (ele) =>
-      ele.dishName.toLowerCase().includes(search.toLowerCase()) ||
-      ele.tableName.toLowerCase().includes(search.toLowerCase()) ||
-      ele.status.toLowerCase().includes(search.toLowerCase())
+      ele?.message?.toLowerCase().includes(search.toLowerCase()) ||
+      ele?.tableName?.toLowerCase().includes(search.toLowerCase()) ||
+      ele?.status?.toLowerCase().includes(search.toLowerCase())
   );
-  const historyData = history.filter(
-    (ele) =>
-      ele.dishName.toLowerCase().includes(search.toLowerCase()) ||
-      ele.tableName.toLowerCase().includes(search.toLowerCase()) ||
-      ele.status.toLowerCase().includes(search.toLowerCase())
-  );
+
+  useEffect(() => {
+    alertData();
+  }, []);
+  async function alertData() {
+    const response = await axios.get(
+      `https://api.hipal.life/v1/kitchens/get/AllAlertByWaiter?waiterId=5&businessId=${businessId}&isAlertOn=true`
+    );
+    const data = await response.data;
+    console.log(data);
+    setData(data);
+  }
 
   return (
     <div className={` bg-[#f5f5f5] min-h-screen pb-20 relative`}>
@@ -282,66 +210,49 @@ function Alert() {
           !showHistory &&
           data.map((ele, index) =>
             ele.status.toLowerCase() === "paid" ? (
-              <div key={`paid-${index}`} onClick={() => handleItemClick(index)}>
-                <Paid {...ele} />
+              <div key={`paid-${index}`}>
+                <Paid {...ele} onClick={() => handleItemClick(index)} />
               </div>
             ) : ele.status.toLowerCase() === "cooked" ? (
-              <div
-                key={`cooked-${index}`}
-                onClick={() => handleItemClick(index)}
-              >
-                <Cooked {...ele} />
+              <div key={`cooked-${index}`}>
+                <Cooked {...ele} onClick={() => handleItemClick(index)} />
               </div>
-            ) : ele.status.toLowerCase() === "assist" ? (
-              <div
-                key={`assist-${index}`}
-                onClick={() => handleItemClick(index)}
-              >
-                <Assistance {...ele} />
+            ) : ele.status.toLowerCase() === "need assistance" ? (
+              <div key={`assist-${index}`}>
+                <Assistance {...ele} onClick={() => handleItemClick(index)} />
               </div>
             ) : (
-              <div
-                key={`clean-${index}`}
-                onClick={() => handleItemClick(index)}
-              >
-                <Clean {...ele} />
+              <div key={`clean-${index}`}>
+                <Clean {...ele} onClick={() => handleItemClick(index)} />
               </div>
             )
           )}
+
         {searchOpen &&
           !showHistory &&
           search !== "" &&
           searchData.map((ele, index) =>
             ele.status.toLowerCase() === "paid" ? (
-              <div key={`paid-${index}`} onClick={() => handleItemClick(index)}>
+              <div key={`paid-${index}`}>
                 <Paid {...ele} />
               </div>
             ) : ele.status.toLowerCase() === "cooked" ? (
-              <div
-                key={`cooked-${index}`}
-                onClick={() => handleItemClick(index)}
-              >
+              <div key={`cooked-${index}`}>
                 <Cooked {...ele} />
               </div>
-            ) : ele.status.toLowerCase() === "assist" ? (
-              <div
-                key={`assist-${index}`}
-                onClick={() => handleItemClick(index)}
-              >
+            ) : ele.status.toLowerCase() === "Need assistance" ? (
+              <div key={`assist-${index}`}>
                 <Assistance {...ele} />
               </div>
             ) : (
-              <div
-                key={`clean-${index}`}
-                onClick={() => handleItemClick(index)}
-              >
+              <div key={`clean-${index}`}>
                 <Clean {...ele} />
               </div>
             )
           )}
         {showHistory &&
           !searchOpen &&
-          history.map((ele, index) => (
+          data.map((ele, index) => (
             <div
               key={index}
               className="mx-6 relative bg-gray-200 h-[4.75rem] rounded-xl"
@@ -353,7 +264,7 @@ function Alert() {
                 {ele?.time}
               </div>
               <div className="font-normal w-[80%] text-[#002D4B]/40 text-[0.875rem] leading-[1rem] absolute left-4 top-10">
-                {ele?.dishName}
+                {ele?.message}
               </div>
               <div className="font-normal text-[#002D4B]/40 text-[0.875rem] leading-[1rem] absolute right-4 top-10">
                 {ele?.status}
@@ -363,7 +274,7 @@ function Alert() {
         {showHistory &&
           searchOpen &&
           search !== "" &&
-          historyData.map((ele, index) => (
+          data.map((ele, index) => (
             <div
               key={index}
               className="mx-6 relative bg-gray-200 h-[4.75rem] rounded-xl"
@@ -375,7 +286,7 @@ function Alert() {
                 {ele?.time}
               </div>
               <div className="font-normal w-[80%] text-[#002D4B]/40 text-[0.875rem] leading-[1rem] absolute left-4 top-10">
-                {ele?.dishName}
+                {ele?.message}
               </div>
               <div className="font-normal text-[#002D4B]/40 text-[0.875rem] leading-[1rem] absolute right-4 top-10">
                 {ele?.status}

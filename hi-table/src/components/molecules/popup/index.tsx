@@ -24,7 +24,7 @@ export default function Popup({
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed inset-0 bg-black bg-opacity-25 backdrop-blur-sm" />
+            <div className="fixed inset-0 bg-opacity-25 backdrop-blur-sm" />
           </Transition.Child>
 
           <div className="fixed inset-x-0 bottom-0 h-screen mx-auto mt-10 overflow-y-auto ">
