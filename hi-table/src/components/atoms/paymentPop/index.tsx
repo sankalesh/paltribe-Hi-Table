@@ -2,7 +2,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import { RxCross2 } from "react-icons/rx";
 
-export default function Popup({
+export default function PaymentPopup({
   children,
   show,
   onClose,
@@ -15,8 +15,8 @@ export default function Popup({
     <>
       <Transition appear show={show} as={Fragment}>
         <Dialog as="div" className="relative z-50" onClose={onClose}>
-          <div className="fixed inset-x-0 bottom-0 h-screen mx-auto mt-10 overflow-y-auto backdrop-blur">
-            <div className="w-screen h-56"></div>
+          <div className="fixed bottom-[4rem] mx-auto overflow-y-auto backdrop-blur">
+            <div className="w-screen h-[15rem]"></div>
             <div className="flex min-h-full text-center">
               <Transition.Child
                 as={Fragment}
@@ -41,11 +41,6 @@ export default function Popup({
                   {children}
                 </Dialog.Panel>
               </Transition.Child>
-              <div className="fixed bottom-0 z-20 w-full py-2 shadow-lg bg-base-100 shadow-base-100">
-                <button className="py-4 w-[85%] space-x-2 text-white bg-[#2C62F0] rounded-full">
-                  Mark all as delivered
-                </button>
-              </div>
             </div>
           </div>
         </Dialog>

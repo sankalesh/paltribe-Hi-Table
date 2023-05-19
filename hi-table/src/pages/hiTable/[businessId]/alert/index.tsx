@@ -45,9 +45,11 @@ interface IAlertData {
   isAlertOn: boolean;
   id: string;
 }
+const guitarSound = new Audio("/sounds/hotel_bell.mp3");
 
 function Alert() {
   const [data, setData] = useState<IAlertData[]>([]);
+  const [historyData, setHistoryData] = useState<IAlertData[]>([]);
   const [search, setSearch] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
@@ -64,28 +66,32 @@ function Alert() {
       );
       return;
     }
-    alertData();
+    onAlertData();
   };
 
-  const handleItemClick = (index: number) => {
-    const item = data[index];
-    const updatedData = [...data]; // Create a copy of the data array
-    updatedData[index].isAlertOn = false; // Update the isAlertOn property of the clicked card
-    setData((updatedData) => updatedData.filter((ele, i) => i !== index));
+  const handleItemClick = async (alertId: string) => {
+      const response = await axios.put(
+        `https://api.hipal.life/v1/kitchens/updateAlert/alert?alertId=${alertId}&businessId=64631183bdc46e36e2e2e1e9`
+      );
+      onAlertData();
+      offAlertData();
   };
 
   const historyOnClick = () => {
-    async function alertData() {
-      const response = await axios.get(
-        `https://api.hipal.life/v1/kitchens/get/AllAlertByWaiter?waiterId=5&businessId=${businessId}&isAlertOn=true`
-      );
-      const data = await response.data;
-      console.log(data);
-      setData(data);
-    }
-    alertData();
     setShowHistory(!showHistory);
   };
+  // const historyOnClick = () => {
+  //   async function alertData() {
+  //     const response = await axios.get(
+  //       `https://api.hipal.life/v1/kitchens/get/AllAlertByWaiter?waiterId=5&businessId=${businessId}&isAlertOn=true`
+  //     );
+  //     const data = await response.data;
+  //     console.log(data);
+  //     setData(data);
+  //   }
+  //   alertData();
+  //   setShowHistory(!showHistory);
+  // };
 
   const popOver = (search = "") => {
     if (search.length > 0) {
@@ -101,6 +107,11 @@ function Alert() {
     setSearchOpen(!searchOpen);
     setSearch("");
   };
+  useEffect(() => {
+    if (data.length > 0) {
+      playGuitarSound();
+    }
+  }, []);
 
   const searchData = data.filter(
     (ele) =>
@@ -108,17 +119,29 @@ function Alert() {
       ele?.tableName?.toLowerCase().includes(search.toLowerCase()) ||
       ele?.status?.toLowerCase().includes(search.toLowerCase())
   );
+  function playGuitarSound() {
+    guitarSound.play();
+  }
 
   useEffect(() => {
-    alertData();
+    onAlertData();
+    offAlertData();
   }, []);
-  async function alertData() {
+  async function onAlertData() {
     const response = await axios.get(
       `https://api.hipal.life/v1/kitchens/get/AllAlertByWaiter?waiterId=5&businessId=${businessId}&isAlertOn=true`
     );
     const data = await response.data;
-    console.log(data);
+    console.log('datta');
     setData(data);
+  }
+  async function offAlertData() {
+    const response = await axios.get(
+      `https://api.hipal.life/v1/kitchens/get/AllAlertByWaiter?waiterId=5&businessId=${businessId}&isAlertOn=false`
+    );
+    const data = await response.data;
+    console.log('datta');
+    setHistoryData(data);
   }
 
   return (
@@ -210,20 +233,32 @@ function Alert() {
           !showHistory &&
           data.map((ele, index) =>
             ele.status.toLowerCase() === "paid" ? (
-              <div key={`paid-${index}`}>
-                <Paid {...ele} onClick={() => handleItemClick(index)} />
+              <div
+                key={`paid-${index}`}
+                onClick={() => handleItemClick(ele.id)}
+              >
+                <Paid {...ele} />
               </div>
             ) : ele.status.toLowerCase() === "cooked" ? (
-              <div key={`cooked-${index}`}>
-                <Cooked {...ele} onClick={() => handleItemClick(index)} />
+              <div
+                key={`cooked-${ele.id}`}
+                onClick={() => handleItemClick(ele.id)}
+              >
+                <Cooked {...ele} />
               </div>
             ) : ele.status.toLowerCase() === "need assistance" ? (
-              <div key={`assist-${index}`}>
-                <Assistance {...ele} onClick={() => handleItemClick(index)} />
+              <div
+                key={`assist-${ele.id}`}
+                onClick={() => handleItemClick(ele.id)}
+              >
+                <Assistance {...ele} />
               </div>
             ) : (
-              <div key={`clean-${index}`}>
-                <Clean {...ele} onClick={() => handleItemClick(index)} />
+              <div
+                key={`clean-${ele.id}`}
+                onClick={() => handleItemClick(ele.id)}
+              >
+                <Clean {...ele} />
               </div>
             )
           )}
@@ -252,13 +287,13 @@ function Alert() {
           )}
         {showHistory &&
           !searchOpen &&
-          data.map((ele, index) => (
+          historyData.map((ele, index) => (
             <div
               key={index}
               className="mx-6 relative bg-gray-200 h-[4.75rem] rounded-xl"
             >
               <div className="font-bold capitalize text-[#002D4B] text-[1rem] leading-[1.25rem] absolute left-4 top-4">
-                {ele?.tableName}
+                {ele?.tableName?"":"T001"}
               </div>
               <div className="font-normal text-[#002D4B]/40 text-[0.875rem] leading-[1rem] absolute right-4 top-4">
                 {ele?.time}

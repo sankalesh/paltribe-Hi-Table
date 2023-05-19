@@ -1,6 +1,8 @@
 import React from "react";
 import { MdCreditCard, MdOutlineSoupKitchen } from "react-icons/md";
 
+const msg = "bxh bcbwwc  wbuiw wjcwcbw ncwikbc wjwnchwhoiww w cwc ikhwwwjw w cwc hw bchjw"
+
 function Cooked({...props}) {
   return (
     <div className="bg-[#2C62F0]/10 mx-6 rounded-2xl">
@@ -31,8 +33,8 @@ function Cooked({...props}) {
         {props.tableName ? props.tableName: "T-01"}
 
         </div>
-        <div className="capitalize w-[90%] font-normal mt-1 text-[#002D4B]/40 text-[0.875rem] leading-[1rem]">
-          {props.message}
+        <div className="capitalize font-normal mt-1 text-[#002D4B]/40 text-[0.875rem] leading-[1rem]">
+          {props.message.length < 30 ? props.message:props.message.slice(0, 30)+"..."}
         </div>
       </div>
       <div>
