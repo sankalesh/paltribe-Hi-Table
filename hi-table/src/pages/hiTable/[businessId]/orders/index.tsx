@@ -5,56 +5,40 @@ import React, { useEffect, useState } from "react";
 import HiPalLogo from "../../../../assets/svg/hipalLogoNew.svg";
 import { useRouter } from "next/router";
 import axios from "axios";
+import CookingAnimation from "@/components/atoms/animation";
+import { IOrder } from "@/components/types/hiTableData";
 
-interface IOrder {
-  businessId: string;
-  tableName: string;
-  staffId: string;
-  items: {
-    businessId: string;
-    kitchenId: string;
-    zoneId: string;
-    tableId: string;
-    staffId: string;
-    dish: {
-      dishId: string;
-      name: string;
-      price: number;
-      qty: number;
-      comments: string;
-      extras: {
-        name: string;
-        price: string;
-        qty: number;
-      }[];
-      portions: {
-        name: string;
-        price: string;
-        discount: string;
-        default: string;
-      };
-    };
-    customerName: string;
-    customerPhone: string;
-  }[];
-  time: string;
-  date: string;
-  isAccept: boolean;
-  customerName: string;
-  customerPhone: string;
-  id: string;
-}
+
+
 
 function Orders() {
   const [data, setData] = useState<IOrder[]>([]);
-
+  const [isOrderAccepted, setOrderAccepted] = useState(false)
   const router = useRouter();
   const { businessId } = router.query as { businessId: string };
 
   useEffect(() => {
     result();
   }, []);
+  const handleAnimationComplete = () => {
+    router.back();
+    result();
+  };
 
+  const acceptOrder = async (id: string) => {
+    console.log(id);
+    try {
+      await axios.put(`https://api.hipal.life/v1/kitchens/waiterKot/update/${id}`);
+      setOrderAccepted(true);
+      setTimeout(() => {
+        // Navigate back to the previous page after 3 seconds
+        window.history.back();
+      }, 3000);
+    } catch (error) {
+      console.error('Failed to update order status:', error);
+    }
+  };
+ 
   const result = async () => {
     const config = {
       method: "GET",
@@ -81,6 +65,11 @@ function Orders() {
       <div className=" ml-6 mt-8 font-bold capitalize text-[#002D4B] text-[1rem] leading-[1.25rem]">
         Orders
       </div>
+      {isOrderAccepted ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <CookingAnimation data={data} onAnimationComplete={handleAnimationComplete} /> 
+        </div>
+      ) : null}
       <div>
         {data.map((ele) => (
           <div key={ele.id} className="bg-white mx-6 rounded-2xl mt-6 mb-[5rem]">
@@ -103,7 +92,7 @@ function Orders() {
             <div className="mx-4 mt-4 border-2 rounded-full border-gray-400/50"></div>
             <div className="relative pt-2 pb-[4.875rem]">
               {ele.items.map((item, i) => (
-                <div className="flex mx-4 mt-4">
+                <div key={item.dish.dishId} className="flex mx-4 mt-4">
                 <div className="w-[10%] font-[500]">{item?.dish?.qty} x</div>
                 <div className="w-[80%] ml-1 font-[500]">
                   {item?.dish?.name}
@@ -121,7 +110,7 @@ function Orders() {
                 <button className="text-md font-[500] text-[#2C62F0] py-1 px-6 rounded-2xl">
                   Reject
                 </button>
-                <button className="active_on_bounce border border-[#2C62F0]  text-md font-[500] text-[#2C62F0] py-1 px-6 rounded-2xl">
+                <button onClick={()=>acceptOrder(ele.id)} className="active_on_bounce border border-[#2C62F0]  text-md font-[500] text-[#2C62F0] py-1 px-6 rounded-2xl">
                   Accept
                 </button>
               </div>

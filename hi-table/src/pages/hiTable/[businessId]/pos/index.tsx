@@ -17,9 +17,7 @@ import ChildCategory from "@/components/organisms/category/childCategory";
 import ParentCategory from "@/components/organisms/category/parentCategory";
 import axios from "axios";
 import { useRouter } from "next/router";
-import { IDishData } from "@/components/types/hiTableData";
-import { NextRequest, NextResponse } from "next/server";
-import { set } from "lodash";
+import { ICategory, IChildCategory } from "@/components/types/hiTableData";
 
 const headerButton = [
   {
@@ -41,10 +39,10 @@ function POS() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
-  const [childCategory, setChildCategory] = useState<IDishData[]>([]);
-  const router = useRouter();
-  console.log(activeButton);
+  const [childCategory, setChildCategory] = useState<IChildCategory[]>([]);
+  const [parentCategory, setParentCategory] = useState<ICategory[]>([]);
 
+  const router = useRouter();
   const { businessId } = router.query as { businessId: string };
 
   useEffect(() => {
@@ -86,9 +84,14 @@ function POS() {
     const result = await axios.get(
       `https://api.hipal.life/v1/categories/get/allChildCategory/?businessId=${businessId}`
     );
+    const result2 = await axios.get(
+      `https://api.hipal.life/v1/categories/get/allParentAndChild?businessId=${businessId}`
+    );
     const ChildCategories = await result.data.data;
-    console.log('hena bhai')
+    const ParentCategories = await result2.data.data;
+
     setChildCategory(ChildCategories);
+    setParentCategory(ParentCategories);
   }
 
   return (
@@ -160,9 +163,11 @@ function POS() {
                 {ele.text}
               </p>
             </div>
-            {i !== headerButton.length - 1 && (
-              <div className="h-6 mx-4 border-l border-r border-gray-400"></div>
-            )}
+            <div>
+              {i !== headerButton.length - 1 && (
+                <div className="h-6 mx-4 border-l border-r border-gray-400"></div>
+              )}
+            </div>
           </>
         ))}
       </div>
@@ -293,7 +298,7 @@ function POS() {
                 Category
               </div>
               <div className="absolute inset-0 pb-4 overflow-y-auto top-12">
-                <ParentCategory />
+                <ParentCategory parentCategory={...parentCategory} />
               </div>
             </div>
           </MenuPopup>

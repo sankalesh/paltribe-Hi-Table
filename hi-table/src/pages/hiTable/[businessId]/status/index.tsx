@@ -24,7 +24,6 @@ function Status() {
   const [activeButton, setActiveButton] = useState("");
   const [statusData, setStatusData] = useState<IStatus[]>([]);
   const router = useRouter();
-  console.log("this is data after filtration", statusData);
   
 
   const { businessId } = router.query as { businessId: string };

@@ -40,8 +40,8 @@ function FoodType({ type }: { type: FOOD_TYPES }) {
 	}, [type])
 
 	return (
-		<div className='flex flex-row my-auto space-x-2 shrink-0'>
-			<div className={'flex flex-row w-3 h-3 border-2 ' + classes[`${_type}`].border}>
+		<div className='flex flex-row my-auto mt-[0.275rem] space-x-2 shrink-0'>
+			<div className={'flex flex-row w-3 h-3 border-2' + classes[`${_type}`].border}>
 				<div
 					className={
 						'm-auto rounded-full p-[0.125rem] w-[0.4rem] h-[0.4rem] ' + classes[`${_type}`].circle

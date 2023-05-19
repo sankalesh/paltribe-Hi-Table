@@ -15,7 +15,7 @@ export default function MenuPopup({
       <Transition appear show={show} as={Fragment}>
         <Dialog as="div" className="relative z-10" onClose={onClose}>
           <div className="fixed inset-0 overflow-y-auto ">
-            <div className="flex items-center justify-center min-h-full p-4 text-center bg-black backdrop-blur-sm bg-opacity-40">
+            <div className="flex items-center justify-center min-h-full p-4 text-center bg-black/10 backdrop-blur-sm bg-opacity-40">
               <Transition.Child
                 as={Fragment}
                 enter="ease-out duration-300"
