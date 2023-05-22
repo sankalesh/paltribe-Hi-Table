@@ -166,7 +166,7 @@ const businessId = userDetails?.customRole?.[0].businessId
         </div>
 
         <div className="flex justify-center mb-5">
-          <button className="on_active_bounce bg-[#2C62F0] rounded-full w-[20.5rem] font-[600] py-[1.3rem] text-white text-[18px] leading-[1.15rem]">
+          <button className="on_active_bounce btn-[#2C62F0] rounded-full w-[20.5rem] font-[600] py-[1.3rem] text-white text-[18px] leading-[1.15rem]">
             Login
           </button>
         </div>

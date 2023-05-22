@@ -9,6 +9,7 @@ export default function ParentCategory({
 }: {
   parentCategory: ICategory[];
 }) {
+  
   return (
     <div className="relative w-full px-4">
       {parentCategory.map((ele) => (
@@ -20,10 +21,10 @@ export default function ParentCategory({
             {({ open }) => (
               <>
                 <Disclosure.Button className="flex justify-between w-full px-4 pt-4 text-lg font-medium text-left rounded-2xl">
-                  <div className="w-[80%] mt-[0.125rem] -ml-4">
+                  <div className="w-[80%] mt-[0.125rem] -ml-1">
                     {ele?.name}
                   </div>
-                  <span className="mt-1 -mr-4">{ele?.childCate?.length}</span>
+                  <span className="mt-1 mr-1">{ele?.childCate?.length}</span>
                   <FiChevronDown
                     className={`${
                       open ? "rotate-180 transform" : ""
@@ -35,7 +36,7 @@ export default function ParentCategory({
                     key={child?.id}
                     className="py-2 text-sm text-gray-500 transition-all duration-300"
                   >
-                    <div className="flex justify-between ">
+                    <div className="flex justify-between">
                       <div className="ml-[1.5rem]">{child?.name}</div>
                       <div className="mr-[3rem]">{child?.dishes?.length}</div>
                     </div>

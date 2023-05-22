@@ -18,11 +18,14 @@ import ParentCategory from "@/components/organisms/category/parentCategory";
 import axios from "axios";
 import { useRouter } from "next/router";
 import {
+  IBusinessData,
   ICategory,
   IChildCategory,
   IStatus,
 } from "@/components/types/hiTableData";
 import PaymentPopup from "@/components/atoms/paymentPop";
+import { intializeAllBusiness } from "@/components/store/useAllBusiness";
+import { useCart } from "@/components/store/useCart";
 
 const headerButton = [
   {
@@ -40,6 +43,7 @@ const headerButton = [
 ];
 
 function POS() {
+  const [data, setData] = useState<any>([]);
   const [activeButton, setActiveButton] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -48,9 +52,28 @@ function POS() {
   const [parentCategory, setParentCategory] = useState<ICategory[]>([]);
   const [statusData, setStatusData] = useState<IStatus[]>([]);
   const [billData, setBillData] = useState<IStatus[]>([]);
+  const [selectedDishes, setSelectedDishes] = useState([]);
+  console.log(selectedDishes)
+
+  const cart = useCart(s=>s.cart)
+  console.log(Object.values(cart).length)
+
+  const addToCart = (dish:any) => {
+    const updatedSelectedDishes = [...selectedDishes, dish];
+    setSelectedDishes(updatedSelectedDishes);
+  };
 
   const router = useRouter();
   const { businessId } = router.query as { businessId: string };
+
+  const childCategories = data?.categories;
+
+  const parentCategories = Object.values(data?.allCategoriesTypes?.main);
+
+  parentCategories.forEach((parent:any) => {
+    const childCategories = Object.values(data?.allCategoriesTypes.sub[parent.id]);
+    parent.childCate = childCategories;
+  });
 
   useEffect(() => {
     getAllChildCategories();
@@ -92,7 +115,7 @@ function POS() {
   };
   async function getAllKotSpecificTable() {
     const response = await axios.get(
-      `https://api.hipal.life/v1/kitchens/6465f75fc3e63b8212ab345c/kots?businessId=${businessId}&tableId=6465f887b637aefee641acfa&kitchenId=6465f75fc3e63b8212ab345c&zoneId=6465f876b637aefee641acf2`
+      `https://api.hipal.life/v1/kitchens/6468653fa44e3608cab1feef/kots?businessId=${businessId}&tableId=64686c53b67a51301343f287&kitchenId=6468653fa44e3608cab1feef&zoneId=64686c33b67a51301343f27d`
     );
     const kotData = response.data;
     console.log(kotData);
@@ -100,7 +123,7 @@ function POS() {
   }
   async function getBill() {
     const response = await axios.get(
-      `https://api.hipal.life/v1/kitchens/6465f75fc3e63b8212ab345c/kots/bill?businessId=6465f737d1e4d1ecf8911920&zoneId=6465f876b637aefee641acf2&tableId=6465f887b637aefee641acfa&kitchenId=6465f75fc3e63b8212ab345c&discount=10`
+      `https://api.hipal.life/v1/kitchens/6468653fa44e3608cab1feef/kots/bill?businessId=${businessId}&zoneId=64686c33b67a51301343f27d&tableId=64686c53b67a51301343f287&kitchenId=6468653fa44e3608cab1feef&discount=10`
     );
     const billData = response.data;
     console.log(billData);
@@ -108,17 +131,12 @@ function POS() {
   }
 
   async function getAllChildCategories() {
-    const result = await axios.get(
-      `https://api.hipal.life/v1/categories/get/allChildCategory/?businessId=${businessId}`
+    const response = await axios.get(
+      `https://api.hipal.life/v1/categories/All/Categories?businessId=${businessId}`
     );
-    const result2 = await axios.get(
-      `https://api.hipal.life/v1/categories/get/allParentAndChild?businessId=${businessId}`
-    );
-    const ChildCategories = await result.data.data;
-    const ParentCategories = await result2.data.data;
-
-    setChildCategory(ChildCategories);
-    setParentCategory(ParentCategories);
+    const data = response.data;
+    setData(data);
+    // console.log(data)
   }
 
   return (
@@ -314,11 +332,11 @@ function POS() {
       )}
       {activeButton.toLowerCase() === "pos" && (
         <div className="">
-          <ChildCategory childCategories={childCategory} />
+          <ChildCategory childCategories={childCategories} addToCart={addToCart } />
           {!isModalOpen ? (
             <div
               onClick={openModal}
-              className={` bg-[#2C62F0] fixed bottom-6 left-1/2 transition-all duration-500 transform -translate-x-1/2 text-white flex items-center justify-center py-2 px-6 rounded-2xl`}
+              className={`bg-[#2C62F0] fixed bottom-6 left-1/2 transition-all duration-500 transform -translate-x-1/2 text-white flex items-center justify-center py-2 px-6 rounded-2xl`}
             >
               <MdOutlineWidgets className="mr-2 text-2xl " />
               <div className="text-lg font-[500]">Menu</div>
@@ -340,7 +358,7 @@ function POS() {
                 Category
               </div>
               <div className="absolute inset-0 pb-4 overflow-y-auto top-12">
-                <ParentCategory parentCategory={...parentCategory} />
+                <ParentCategory parentCategory={parentCategories} />
               </div>
             </div>
           </MenuPopup>

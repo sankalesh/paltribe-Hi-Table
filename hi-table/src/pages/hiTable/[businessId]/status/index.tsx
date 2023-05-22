@@ -173,7 +173,7 @@ function Status() {
               key={i}
               className={
                 activeButton === ele.text
-                  ? "bg-blue-500 focus:font-[500] focus:rounded-full focus:text-[#2C62F0] focus:bg-[#2C62F0]/10 "
+                  ? "bg-blue-500 focus:font-[500] focus:rounded-full focus:text-[#2C62F0] focus:btn-[#2C62F0]/10 "
                   : ""
               }
               onClick={() => handleOnclick(ele.text)}
