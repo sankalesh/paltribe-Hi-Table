@@ -23,7 +23,9 @@ import {
   ICategory,
   IChildCategory,
   IDish,
+  IExtraItem,
   IKot,
+  IPortion,
   IStatus,
 } from "@/components/types/hiTableData";
 import PaymentPopup from "@/components/atoms/paymentPop";
@@ -32,6 +34,7 @@ import { useCart } from "@/components/store/useCart";
 import DishQuantityButton from "@/components/organisms/dishDescription/dishQuantityButton";
 import FoodType from "@/components/atoms/foodType";
 import { getDishPrice } from "@/components/utils/helpers";
+import { isEmpty } from "lodash";
 
 const headerButton = [
   {
@@ -56,49 +59,48 @@ const paymentMethods = [
 ];
 
 function POS() {
-  const [data, setData] = useState<any>([]);
+  /********************* Using in settle pos and settle *************************/
   const [activeButton, setActiveButton] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
+  const [footButton, setFootButton] = useState("");
+  const cart = useCart((s) => s.cart);
+  const setCart = useCart((s) => s.setCart);
+  const router = useRouter();
+  const { businessId } = router.query as { businessId: string };
+
+  /*************************Settle part for individual**************************************/
+  const [selectedDishStatus, setSelectedDishStatus] = useState<IKot | null>(
+    null
+  );
+  const [statusData, setStatusData] = useState<IKot[]>([]);
+
+  /****************************** pos ***************************************/
   const [childCategory, setChildCategory] = useState<IChildCategory[]>([]);
   const [parentCategory, setParentCategory] = useState<ICategory[]>([]);
-  const [statusData, setStatusData] = useState<IStatus[]>([]);
+  const [data, setData] = useState<any>([]);
+
+  /******************************** settle part ***********************************/
   const [billData, setBillData] = useState<IStatus[]>([]);
   const [selectedDishes, setSelectedDishes] = useState([]);
   const [discountValue, setDiscountValue] = useState(0);
   const [discountMode, setDiscountMode] = useState("rupees");
   const [discount, setDiscount] = useState(0);
-  const [selectedDishStatus, setSelectedDishStatus] = useState<IKot | null>(
-    null
-  );
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
-  console.log("this is ",billData[billData.length-1])
 
-  // Function to handle payment method selection
-  const handlePaymentMethodSelection = (methodId) => {
-    if (selectedPaymentMethod === methodId) {
-      setSelectedPaymentMethod("");
-    } else {
-      setSelectedPaymentMethod(methodId);
-    }
-  };
+  /********************* All functions are related to status *********************/
 
-  const [footButton, setFootButton] = useState("");
-  console.log(discount);
+  async function getAllKotSpecificTable() {
+    const response = await axios.get(
+      `https://api.hipal.life/v1/kitchens/646f5e2fbf0a20e565202066/kots/allKot?businessId=${businessId}&tableId=646f5e8f85b91d05bb2f5eb7&kitchenId=646f5e2fbf0a20e565202066&zoneId=646f5e6f85b91d05bb2f5eac`
+    );
+    const kotData = response.data;
+    if (!kotData) return;
+    setStatusData(kotData);
+  }
 
-  const handleDiscountChange = (e: any) => {
-    setDiscountValue(e.target.value);
-  };
-
-  const handleDiscountModeChange = (e: any) => {
-    setDiscountMode(e.target.value);
-  };
-
-  const cart = useCart((s) => s.cart);
-
-  const router = useRouter();
-  const { businessId } = router.query as { businessId: string };
+  /********************* All functions are related to pos *********************/
 
   const childCategories = data?.categories ?? [];
 
@@ -110,6 +112,76 @@ function POS() {
     );
     parent.childCate = childCategories;
   });
+
+  const getDishPrice = (
+    dishData: IDish,
+    selectedPortion: IPortion,
+    selectedExtras: IExtraItem
+  ) => {
+    let price = 0;
+    if (selectedPortion === undefined) {
+      price += parseFloat(dishData?.price);
+    }
+    // Add portion price
+    const portion = dishData?.portions.find(
+      (portion) => portion?.name === selectedPortion
+    );
+    if (portion) {
+      price += parseFloat(portion.price);
+    }
+    // Add extra prices
+    selectedExtras.map((extra, i) => {
+      price += parseFloat(extra?.price);
+    });
+
+    return price.toFixed(2);
+  };
+
+  const handleDeleteItem = (dishId: string) => {
+    // If dish is in the cart, update the variant
+
+    // console.log('cart_asdfasdf asdf', cart, dishData)
+    if (cart?.[dishData?.dishId]) {
+      const newCart = {};
+
+      // remove dish object
+      Object.values(cart).forEach((dish) => {
+        if (dish.dishId !== dishData?.dishId) {
+          newCart[dish.dishId] = dish;
+        }
+      });
+
+      setCart(newCart);
+    }
+  };
+
+  async function getAllChildCategories() {
+    const response = await axios.get(
+      `https://api.hipal.life/v1/categories/All/Categories?businessId=${businessId}`
+    );
+    const data = response.data.data;
+    if (!data) return;
+    setData(data);
+  }
+
+  /*********************All functions are related to settle *********************/
+
+  // Function to handle payment method selection
+  const handlePaymentMethodSelection = (methodId) => {
+    if (selectedPaymentMethod === methodId) {
+      setSelectedPaymentMethod("");
+    } else {
+      setSelectedPaymentMethod(methodId);
+    }
+  };
+
+  const handleDiscountChange = (e: any) => {
+    setDiscountValue(e.target.value);
+  };
+
+  const handleDiscountModeChange = (e: any) => {
+    setDiscountMode(e.target.value);
+  };
 
   const handleDishSelection = (dishId) => {
     const isDishSelected = selectedDishes.includes(dishId);
@@ -196,10 +268,33 @@ function POS() {
     }
   };
 
-  useEffect(() => {
-    getAllChildCategories();
-  }, []);
+  async function getBill() {
+    const response = await axios.get(
+      `https://api.hipal.life/v1/kitchens/646f5e2fbf0a20e565202066/kots/bill?businessId=${businessId}&zoneId=646f5e6f85b91d05bb2f5eac&tableId=646f5e8f85b91d05bb2f5eb7&kitchenId=646f5e2fbf0a20e565202066&discount=${discount}&${setSelectedPaymentMethod}`
+    );
+    const billData = response.data;
+    if (!billData) return;
+    setBillData(billData);
+  }
+  const finalClick = async () => {
+    console.log("first");
+    try {
+      const config = {
+        method: "put",
+        url: "https://api.hipal.life/v1/kitchens/updateKot/and/updatePayment",
+        data: billData[billData.length - 1],
+      };
 
+      const res = await axios(config);
+      if (res.status) {
+        alert("Thank you! Visit again...");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  /************************* functions for small changes *****************************/
   const footerButton = (str: string) => {
     console.log(str);
     setFootButton(str);
@@ -223,6 +318,7 @@ function POS() {
   const handleOnClick = (str: string) => {
     // str = activeButton.length === 0 ? str : "";
     if (str.toLowerCase() === "pos") {
+      console.log(str);
       getAllChildCategories();
     } else if (str.toLowerCase() === "status") {
       getAllKotSpecificTable();
@@ -241,68 +337,10 @@ function POS() {
     setIsModalOpen(false);
     setFootButton("");
   };
-  async function getAllKotSpecificTable() {
-    const response = await axios.get(
-      `https://api.hipal.life/v1/kitchens/6468653fa44e3608cab1feef/kots/allKot?businessId=${businessId}&tableId=64686c53b67a51301343f287&kitchenId=6468653fa44e3608cab1feef&zoneId=64686c33b67a51301343f27d`
-    );
-    const kotData = response.data;
-    console.log(kotData);
-    setStatusData(kotData);
-  }
-  async function getBill() {
-    const response = await axios.get(
-      `https://api.hipal.life/v1/kitchens/6468653fa44e3608cab1feef/kots/bill?businessId=${businessId}&zoneId=64686c33b67a51301343f27d&tableId=64686c53b67a51301343f287&kitchenId=6468653fa44e3608cab1feef&discount=${discount}&${setSelectedPaymentMethod}`
-    );
-    const billData = response.data;
-    console.log(billData);
-    setBillData(billData);
-  }
 
-  async function getAllChildCategories() {
-    const response = await axios.get(
-      `https://api.hipal.life/v1/categories/All/Categories?businessId=${businessId}`
-    );
-    const data = response.data;
-    setData(data);
-  }
-
-  const getDishPrice = (dishData: IDish, selectedPortion, selectedExtras) => {
-    let price = 0;
-    if (selectedPortion === undefined) {
-      price += parseFloat(dishData?.price);
-    }
-    // Add portion price
-    const portion = dishData?.portions.find(
-      (portion) => portion?.name === selectedPortion
-    );
-    if (portion) {
-      price += parseFloat(portion.price);
-    }
-    // Add extra prices
-    selectedExtras.map((extra, i) => {
-      price += parseFloat(extra?.price);
-    });
-
-    return price.toFixed(2);
-  };
-  const finalClick = async () => {
-    console.log('first');
-    try {
-      const config = {
-        method: 'put',
-        url: 'https://api.hipal.life/v1/kitchens/updateKot/and/updatePayment',
-        data: billData[billData.length - 1],
-      };
-  
-      const res = await axios(config);
-      if (res.status) {
-        alert("Thank you! Visit again...");
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-  
+  useEffect(() => {
+    getAllChildCategories();
+  }, []);
 
   return (
     <div className="bg-[#f5f5f5] min-h-screen relative">
@@ -322,7 +360,7 @@ function POS() {
           className={`${
             activeButton.toLowerCase() === "status" ||
             activeButton.toLowerCase() === "settle" ||
-            activeButton.toLowerCase() === ""
+            activeButton.toLowerCase() === "pos"
               ? "hidden"
               : ""
           } flex`}
@@ -605,12 +643,13 @@ function POS() {
               </div>
             </MenuPopup>
           ) : (
-            <MenuPopup show={isModalOpen} onClose={closeModal}>
-              <div className="relative min-h-[40rem]">
+            <PaymentPopup show={isModalOpen} onClose={closeModal}>
+              <div className="relative h-[80vh]">
                 <div className="fixed top-0 left-0 right-0 px-4 py-2 capitalize font-[500] ml-2 mt-2 text-[#002D4B] text-[1rem] leading-[1.25rem] bg-white">
                   Category
                 </div>
                 <div className="mt-4 border border-b-dashed"></div>
+
                 <div className="pb-[5rem] top-6 mx-6 absolute inset-0 overflow-y-auto">
                   {Object.values(cart)?.map((cartItem, index) => {
                     const { dishData, variants } = cartItem;
@@ -619,7 +658,7 @@ function POS() {
                     const price = dishData?.price;
 
                     return variants.map((variant, variantIndex) => {
-                      const { portion, extra } = variant;
+                      const { portion, extra, id, quantity } = variant;
                       const selectedPortion = portion?.name;
                       const selectedExtra = extra
                         ? Object.values(extra)?.filter(
@@ -627,74 +666,79 @@ function POS() {
                           )
                         : [];
                       return (
+                        <div key={`${dishData?.id}-${index}-${variantIndex}`}>
                         <div
                           className="relative flex justify-between mt-6"
-                          key={`${dishData?.id}-${index}-${variantIndex}`}
+                          
                         >
                           <div className="mr-2">
                             <FoodType type={dishData?.dishType} />
                           </div>
-                          <div className="w-[70%]">
-                            <div className="text-[#002D4B] font-bold text-[1rem] leading-[1.25rem]">
+                          <div className="w-[70%] -ml-12">
+                            <div className="text-[#002D4B] font-[500] text-[1rem] leading-[1.25rem]">
                               {name?.length < 35
                                 ? name
                                 : name.slice(0, 35) + "..."}
                             </div>
-                            {/* {selectedPortion?.length>0 &&
-                              <div>
-                              {selectedPortion} - ₹ {portion?.price}
-                            </div>
-                            } */}
-                            <div
-                              className={`${
-                                name?.length < 20 ? "mt-6" : "mt-2"
-                              } -ml-5 text-[#002D4B]/50 font-bold text-[1rem] leading-[1.25rem]`}
-                            >
-                              ₹ {price}
-                            </div>
-                          </div>
-                          <div className="-mt-2">
-                            {/* {selectedExtra.length > 0 && (
-                              <div>
-                                {selectedExtra.map((extraItem, extraIndex) => (
-                                  <div
-                                    key={`${dishData?.id}-${index}-${variantIndex}-${extraIndex}`}
-                                  >
-                                    {extraItem.name} - ₹ {extraItem.price}
-                                  </div>
-                                ))}
+                            {selectedPortion?.length > 0 && (
+                              <div className=" text-[#002D4B]/50 font-[500] mt-1 text-[1rem] leading-[1.25rem]">
+                                <div>{selectedPortion}</div>
+                                <div>
+                                  {selectedExtra.map(
+                                    (extraItem, extraIndex) => (
+                                      <div
+                                        key={`${dishData?.id}-${index}-${variantIndex}-${extraIndex}`}
+                                      >
+                                        {extraItem.name}
+                                      </div>
+                                    )
+                                  )}
+                                </div>
                               </div>
-                            )} */}
-                            <DishQuantityButton dishData={dishData} />
-                            <div className="text-[#002D4B]/50 ml-12 font-bold mt-4 text-[1rem] leading-[1.25rem]">
-                              ₹
-                              {getDishPrice(
-                                dishData,
-                                selectedPortion,
-                                selectedExtra
-                              )}
+                            )}
+
+                            <div className="flex justify-between">
+                              <div className="text-[#002D4B]/50 mt-2 font-[500] text-[1rem] leading-[1.25rem]">
+                                ₹
+                                {getDishPrice(
+                                  dishData,
+                                  selectedPortion,
+                                  selectedExtra
+                                )}
+                              </div>
+                              
+                              <div className="text-[#2C62F0] mt-2 -mr-[5.5rem] font-[500] text-[1rem] leading-[1.25rem]">
+                                Delete
+                              </div>
                             </div>
                           </div>
+                          <div className="mr-6 text-[#002D4B]/ font-[500] text-[1rem] leading-[1.25rem]">x 1</div>
+                        </div>
+                        <div className="mt-6 border border-dashed">
+                        </div>
                         </div>
                       );
                     });
                   })}
                 </div>
               </div>
-              <div className="bg-[#2C62F0] pb-4 pt-4">
+              <div className="pb-4 pt-4 fixed w-full h-[4rem] bottom-0 bg-[#2C62F0]">
                 <div className="mx-[3rem] flex justify-between">
                   <button
-                    onClick={closeModal}
-                    className="capitalize text-sm px-4 py-2 mr-2 font-[500] text-[#2C62F0] bg-white rounded-full"
+                    onClick={openModal}
+                    className="absolute text-sm flex px-4 py-2 mr-2 text-white bg-[#2C62F0] rounded-full bottom-3 left-6"
                   >
-                    cancel
+                    <RiShoppingBagLine className="mt-[0.125rem] mr-2 -ml-4 " />
+                    Items Added
+                    <MdOutlineKeyboardArrowUp className="ml-3 text-xl" />
                   </button>
-                  <button className=" text-sm px-4 py-2 mr-2 font-[500] text-[#2C62F0] bg-white rounded-full">
-                    Confirm
+
+                  <button className="absolute text-sm px-4 py-2 mr-2 font-[500] text-[#2C62F0] bg-white rounded-full right-6 bottom-3">
+                    Continue
                   </button>
                 </div>
               </div>
-            </MenuPopup>
+            </PaymentPopup>
           )}
           <div
             className={`${
@@ -862,20 +906,25 @@ function POS() {
                       <input
                         type="checkbox"
                         checked={selectedPaymentMethod === method?.id}
-                        onChange={() => handlePaymentMethodSelection(method?.id)}
+                        onChange={() =>
+                          handlePaymentMethodSelection(method?.id)
+                        }
                       />
-                      <label className="ml-2 line-clamp-1">{method?.name}</label>
+                      <label className="ml-2 line-clamp-1">
+                        {method?.name}
+                      </label>
                     </div>
                   ))}
                 </div>
-                
+
                 <div className="w-full h-[4rem] bg-[#2C62F0] fixed bottom-0 z-20 py-2 shadow-lg shadow-base-100">
                   <button className="absolute px-4 text-base py-2 mr-2 font-[500]  text-white bg-[#2C62F0] rounded-full bottom-3 left-6">
                     ₹ Payment Modes
                   </button>
-                  <button 
-                  onClick={finalClick}
-                  className="absolute z-50 text-sm font-[500] px-4 py-2 mr-2 border-white border text-[#2C62F0] bg-white rounded-full right-6 bottom-3">
+                  <button
+                    onClick={finalClick}
+                    className="absolute z-50 text-sm font-[500] px-4 py-2 mr-2 border-white border text-[#2C62F0] bg-white rounded-full right-6 bottom-3"
+                  >
                     Continue
                   </button>
                 </div>
