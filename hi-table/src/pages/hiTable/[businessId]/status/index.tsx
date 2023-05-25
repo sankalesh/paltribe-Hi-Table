@@ -14,7 +14,7 @@ import HiPalLogo from "../../../../assets/svg/hipalLogoNew.svg";
 import Image from "next/image";
 import axios from "axios";
 import { useRouter } from "next/router";
-import { IStatus } from "@/components/types/hiTableData";
+import { IKot, IStatus } from "@/components/types/hiTableData";
 
 function Status() {
   const [filterClicked, setFilterClicked] = useState(false);
@@ -23,13 +23,16 @@ function Status() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeButton, setActiveButton] = useState("");
   const [statusData, setStatusData] = useState<IStatus[]>([]);
+  const [selectedDishStatus, setSelectedDishStatus] = useState<IKot | null>(
+    null
+  );
   const router = useRouter();
-  
-
   const { businessId } = router.query as { businessId: string };
 
-  const openModal = () => {
+  const openModal = (kot: IKot) => {
+    console.log(kot);
     setIsModalOpen(true);
+    setSelectedDishStatus(kot);
   };
 
   const closeModal = () => {
@@ -52,18 +55,20 @@ function Status() {
   };
 
   const handleOnclick = (str: any) => {
-     str = activeButton.length === 0 ? str : "";
+    str = activeButton.length === 0 ? str : "";
     setActiveButton(str);
     if (str.length > 0) {
       setStatusData(
         statusData?.map((ele, i) => {
-              const kot = ele[0];
-              return ele?.filter((k) => k?.dishStatus.toLowerCase() === str.toLowerCase());
-            })
+          const kot = ele[0];
+          return ele?.filter(
+            (k) => k?.dishStatus.toLowerCase() === str.toLowerCase()
+          );
+        })
       );
       return;
     }
-    getAllStatusData()
+    getAllStatusData();
     setStatusData(statusData);
   };
 
@@ -190,99 +195,172 @@ function Status() {
           // Get the first element from the current sub-array
           const kot = ele[0];
 
-          return ( 
+          return (
             <div>
-              {ele.dishStatus !== "" && <div key={ele?.id} className="mx-6 mb-6 bg-white rounded-2xl">
-              <div className="flex justify-between pt-4 mx-4">
-                <div className="flex flex-col">
-                  <div className="font-[500] capitalize">T-{i}</div>
-                  <div className="capitalize font-normal text-[#002D4B]/40 text-[0.875rem] mt-1 leading-[1rem]">
-                    {kot?.customerName}
+              {ele.dishStatus !== "" && (
+                <div key={ele?.id} className="mx-6 mb-6 bg-white rounded-2xl">
+                  <div className="flex justify-between pt-4 mx-4">
+                    <div className="flex flex-col">
+                      <div className="font-[500] capitalize">T-{i}</div>
+                      <div className="capitalize font-normal text-[#002D4B]/40 text-[0.875rem] mt-1 leading-[1rem]">
+                        {kot?.customerName}
+                      </div>
+                    </div>
+                    <div className="flex flex-col">
+                      <div className="text-right text-md font-[500] text-[#2C62F0]">
+                        {kot?.kotTime}
+                      </div>
+                      <div className="capitalize font-normal mt-1 text-[#002D4B]/40 text-[0.875rem] leading-[1rem]">
+                        {kot?.date}
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div className="flex flex-col">
-                  <div className="text-right text-md font-[500] text-[#2C62F0]">
-                    {kot?.kotTime}
-                  </div>
-                  <div className="capitalize font-normal mt-1 text-[#002D4B]/40 text-[0.875rem] leading-[1rem]">
-                    {kot?.date}
-                  </div>
-                </div>
-              </div>
 
-              <div className="mx-4 mt-4 border-2 rounded-full border-gray-400/30"></div>
-              {ele?.map((kot) => (
-                <div>
-                  <div className="flex justify-between mx-4 mt-4">
-                    <div className="w-[10%] font-[500]">{kot?.dish?.qty} x</div>
-                    <div className="w-[60%] -ml-4 font-[500]">
-                      {kot?.dish?.name}
-                      <div className="capitalize font-normal text-[#002D4B]/40 text-[0.875rem] mt-1 leading-[1rem]">
-                        {kot?.dish?.portions?.name}
+                  <div className="mx-4 mt-4 border-2 rounded-full border-gray-400/30"></div>
+                  {ele?.map((kot) => (
+                    <div>
+                      <div className="flex justify-between mx-4 mt-4">
+                        <div className="w-[10%] font-[500]">
+                          {kot?.dish?.qty} x
+                        </div>
+                        <div className="w-[60%] -ml-4 font-[500]">
+                          {kot?.dish?.name}
+                          <div className="capitalize font-normal text-[#002D4B]/40 text-[0.875rem] mt-1 leading-[1rem]">
+                            {kot?.dish?.portions?.name}
+                          </div>
+                          <div className="capitalize font-normal text-[#002D4B]/40 text-[0.875rem] mt-1 leading-[1rem]">
+                            {kot?.dish?.extras?.map(
+                              (extra) => extra?.name + ", "
+                            )}
+                          </div>
+                        </div>
+                        <div
+                          className={`${
+                            ele.dishStatus === "delivered" ? "hidden" : ""
+                          } w-[15%] text-right text-md font-[500] text-[#2C62F0]`}
+                          onClick={() => openModal(kot)}
+                        >
+                          Status
+                        </div>
+
+                        <Popup show={isModalOpen} onClose={closeModal}>
+                          <div className="relative">
+                            <div className="capitalize font-[500] ml-6 mt-4 text-[#002D4B] text-[1rem] leading-[1.25rem]">
+                              {selectedDishStatus?.tableName
+                                ? selectedDishStatus?.tableName
+                                : "T-001"}
+                            </div>
+                            <div className="mt-4 border border-b-dashed"></div>
+
+                            <div className="flex justify-between mx-4 mt-4">
+                              <div className="w-[60%] mx-2 font-[500]">
+                                {selectedDishStatus?.dish?.name}
+                                <div className="capitalize font-normal text-[#002D4B]/40 text-[0.875rem] mt-1 leading-[1rem]">
+                                  {selectedDishStatus?.dish?.portions?.name}
+                                </div>
+                                <div className="capitalize font-normal text-[#002D4B]/40 text-[0.875rem] mt-1 leading-[1rem]">
+                                  {selectedDishStatus?.dish?.extras?.map(
+                                    (extra) => extra?.name + ", "
+                                  )}
+                                </div>
+                              </div>
+                              <div className="flex flex-col">
+                                <div className="text-right text-md font-[500] text-[#2C62F0]">
+                                  {selectedDishStatus?.kotTime}
+                                </div>
+                                <div className="capitalize font-normal mt-1 text-[#002D4B]/40 text-[0.875rem] leading-[1rem]">
+                                  {selectedDishStatus?.date}
+                                </div>
+                              </div>
+                            </div>
+                            {selectedDishStatus?.dishStatus === "delivered" ? (
+                              <div className="py-4 mx-4">
+                                <button className="font-normal relative px-2 text-black rounded-full bg-[#DBFFE2]">
+                                  <div className="inline-flex items-center justify-start">
+                                    <div className="w-[1.5rem] absolute left-1 h-[1.5rem] bg-[#00BA34] rounded-full">
+                                      <BiBowlRice className="mt-1 ml-1 text-white" />
+                                    </div>
+                                    <div className="mb-[0.1rem] capitalize font-[500] text-lg text-[#00BA34]/80 pr-1 pl-1 ml-6 mr-4">
+                                      {selectedDishStatus?.dishStatus} x 1
+                                    </div>
+                                  </div>
+                                </button>
+                              </div>
+                            ) : selectedDishStatus?.dishStatus === "cooked" ? (
+                              <div className="py-4 mx-4">
+                                <button className="font-normal relative px-2 text-black rounded-full bg-[#E0EBFF]">
+                                  <div className="inline-flex items-center justify-start">
+                                    <div className="w-[1.5rem] absolute left-1 h-[1.5rem] bg-[#5591FF] rounded-full">
+                                      <BiBowlRice className="mt-1 ml-1 text-white" />
+                                    </div>
+                                    <div className="mb-[0.1rem] capitalize font-[500] text-lg text-[#5591FF]/80 pr-1 pl-1 ml-6 mr-4">
+                                      {selectedDishStatus?.dishStatus} x 1
+                                    </div>
+                                  </div>
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="py-4 mx-4">
+                                <button className="font-normal relative px-2 text-black rounded-full bg-[#FFF6DB]">
+                                  <div className="inline-flex items-center justify-start">
+                                    <div className="w-[1.5rem] absolute left-1 h-[1.5rem] bg-[#FFC318] rounded-full">
+                                      <BiBowlRice className="mt-1 ml-1 text-white" />
+                                    </div>
+                                    <div className="mb-[0.1rem] capitalize font-[500] text-lg text-[#FFC318]/80 pr-1 pl-1 ml-6 mr-4">
+                                      {selectedDishStatus?.dishStatus} x 1
+                                    </div>
+                                  </div>
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </Popup>
                       </div>
-                      <div className="capitalize font-normal text-[#002D4B]/40 text-[0.875rem] mt-1 leading-[1rem]">
-                        {kot?.dish?.extras?.map((extra) => extra?.name + ", ")}
-                      </div>
-                    </div>
-                    <div
-                      className="w-[15%] text-right text-md font-[500] text-[#2C62F0] "
-                      onClick={openModal}
-                    >
-                      Status
-                    </div>
-                    <Popup show={isModalOpen} onClose={closeModal}>
-                      <div className="relative">
-                        <div className="capitalize font-[500] ml-6 mt-4 text-[#002D4B] text-[1rem] leading-[1.25rem]">
-                          T-001
+                      {kot?.dishStatus === "delivered" ? (
+                        <div className="py-4 mx-4">
+                          <button className="font-normal relative px-2 text-black rounded-full bg-[#DBFFE2]">
+                            <div className="inline-flex items-center justify-start">
+                              <div className="w-[1.5rem] absolute left-1 h-[1.5rem] bg-[#00BA34] rounded-full">
+                                <BiBowlRice className="mt-1 ml-1 text-white" />
+                              </div>
+                              <div className="mb-[0.1rem] capitalize font-[500] text-lg text-[#00BA34]/80 pr-1 pl-1 ml-6 mr-4">
+                                {kot?.dishStatus} x 1
+                              </div>
+                            </div>
+                          </button>
                         </div>
-                        <div className="mt-4 border border-b-dashed"></div>
-                      </div>
-                    </Popup>
-                  </div>
-                  {kot?.dishStatus === "delivered" ? (
-                    <div className="py-4 mx-4">
-                      <button className="font-normal relative px-2 text-black rounded-full bg-[#DBFFE2]">
-                        <div className="inline-flex items-center justify-start">
-                          <div className="w-[1.5rem] absolute left-1 h-[1.5rem] bg-[#00BA34] rounded-full">
-                            <BiBowlRice className="mt-1 ml-1 text-white" />
-                          </div>
-                          <div className="mb-[0.1rem] capitalize font-[500] text-lg text-[#00BA34]/80 pr-1 pl-1 ml-6 mr-4">
-                            {kot?.dishStatus} x 1
-                          </div>
+                      ) : kot?.dishStatus === "cooked" ? (
+                        <div className="py-4 mx-4">
+                          <button className="font-normal relative px-2 text-black rounded-full bg-[#E0EBFF]">
+                            <div className="inline-flex items-center justify-start">
+                              <div className="w-[1.5rem] absolute left-1 h-[1.5rem] bg-[#5591FF] rounded-full">
+                                <BiBowlRice className="mt-1 ml-1 text-white" />
+                              </div>
+                              <div className="mb-[0.1rem] capitalize font-[500] text-lg text-[#5591FF]/80 pr-1 pl-1 ml-6 mr-4">
+                                {kot?.dishStatus} x 1
+                              </div>
+                            </div>
+                          </button>
                         </div>
-                      </button>
-                    </div>
-                  ) : kot?.dishStatus === "cooked" ? (
-                    <div className="py-4 mx-4">
-                      <button className="font-normal relative px-2 text-black rounded-full bg-[#E0EBFF]">
-                        <div className="inline-flex items-center justify-start">
-                          <div className="w-[1.5rem] absolute left-1 h-[1.5rem] bg-[#5591FF] rounded-full">
-                            <BiBowlRice className="mt-1 ml-1 text-white" />
-                          </div>
-                          <div className="mb-[0.1rem] capitalize font-[500] text-lg text-[#5591FF]/80 pr-1 pl-1 ml-6 mr-4">
-                            {kot?.dishStatus} x 1
-                          </div>
+                      ) : (
+                        <div className="py-4 mx-4">
+                          <button className="font-normal relative px-2 text-black rounded-full bg-[#FFF6DB]">
+                            <div className="inline-flex items-center justify-start">
+                              <div className="w-[1.5rem] absolute left-1 h-[1.5rem] bg-[#FFC318] rounded-full">
+                                <BiBowlRice className="mt-1 ml-1 text-white" />
+                              </div>
+                              <div className="mb-[0.1rem] capitalize font-[500] text-lg text-[#FFC318]/80 pr-1 pl-1 ml-6 mr-4">
+                                {kot?.dishStatus} x 1
+                              </div>
+                            </div>
+                          </button>
                         </div>
-                      </button>
+                      )}
+                      <div className="mx-4 border-b border-dashed"></div>
                     </div>
-                  ) : (
-                    <div className="py-4 mx-4">
-                      <button className="font-normal relative px-2 text-black rounded-full bg-[#FFF6DB]">
-                        <div className="inline-flex items-center justify-start">
-                          <div className="w-[1.5rem] absolute left-1 h-[1.5rem] bg-[#FFC318] rounded-full">
-                            <BiBowlRice className="mt-1 ml-1 text-white" />
-                          </div>
-                          <div className="mb-[0.1rem] capitalize font-[500] text-lg text-[#FFC318]/80 pr-1 pl-1 ml-6 mr-4">
-                            {kot?.dishStatus} x 1
-                          </div>
-                        </div>
-                      </button>
-                    </div>
-                  )}
-                  <div className="mx-4 border-b border-dashed"></div>
+                  ))}
                 </div>
-              ))}
-            </div>}
+              )}
             </div>
           );
         })}

@@ -15,10 +15,8 @@ import DishQuantityButton from "../../dishDescription/dishQuantityButton";
 
 export default function ChildCategory({
   childCategories,
-  addToCart,
 }: {
   childCategories: IChildCategory[];
-  addToCart: (dish: IDish) => void;
 }) {
   const [openChild, setOpenChild] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -68,8 +66,8 @@ export default function ChildCategory({
                               className="relative flex justify-between mt-6"
                               key={dish?.id}
                             >
-                              <div className="">
-                                <FoodType type="veg" />
+                              <div className="mr-2">
+                                <FoodType type={dish?.dishType} />
                               </div>
                               <div className="w-[70%]">
                                 <div className="text-[#002D4B] text-[1rem] leading-[1.25rem]">
@@ -78,6 +76,56 @@ export default function ChildCategory({
                                 <div className="mt-2 text-[#002D4B]/40 text-[1rem] leading-[1.25rem]">
                                   ₹ {dish?.price}
                                 </div>
+                                {
+                                  <MenuPopup
+                                    show={isModalOpen}
+                                    onClose={closeModal}
+                                  >
+                                    <div className="relative min-h-[15rem] max-h-[30rem] mb-6 overflow-auto">
+                                      <div className="flex h-[12rem] justify-center mx-4 mt-4">
+                                        <Image
+                                          width={350}
+                                          height={200}
+                                          src="https://storage.hipal.life/minio/assets/dae7a31d-7314-4a6b-8417-bc5e17c460bb.jpeg"
+                                          alt=""
+                                        />
+                                      </div>
+                                      <div className="text-[#002D4B] capitalize font-[500] text-xl mx-4 mt-4">
+                                      {dish?.name}
+                                      </div>
+                                      <div className=" mx-4 flex text-[#002D4B] text-[1rem] leading-[1.25rem] mt-4">
+                                        <FoodType type={dish?.dishType} />
+                                        <div>{dish?.dishType}</div>
+                                      </div>
+                                      <div className="text-[#002D4B] capitalize text-base mx-4 mt-4">
+                                        Average time {dish?.avgTime} minutes(running on
+                                        delay)
+                                      </div>
+                                      <div className="text-[#002D4B]/40 text-base mx-4 mt-2 line-clamp-3">
+                                        Lorem ipsum dolor sit amet consectetur
+                                        adipisicing elit. Magnam, quis? Lorem
+                                        ipsum dolor sit amet consectetur
+                                        adipisicing elit. Magnam, quis? Lorem
+                                        ipsum dolor sit amet consectetur
+                                        adipisicing elit. Magnam, quis?
+                                      </div>
+                                      <div className="text-[#2C62F0] flex space-x-2 capitalize text-base mx-4 mt-2">
+                                        <BiBowlRice className="mt-1" />
+                                        <span>3 portions Available</span>
+                                      </div>
+                                      <div className="text-[#002D4B]/40 text-base mx-4 mt-2 line-clamp-3">
+                                      
+                                      </div>
+                                      <div className="text-[#2C62F0] flex space-x-2 capitalize text-base mx-4 mt-2">
+                                        <BiBowlRice className="mt-1" />
+                                        <span>3 portions Available</span>
+                                      </div>
+                                      <div className="text-[#002D4B]/40 text-base mx-4 mt-2 line-clamp-3">
+                                      
+                                      </div>
+                                    </div>
+                                  </MenuPopup>
+                                }
                                 {!isModalOpen ? (
                                   <div
                                     onClick={openModal}
@@ -98,7 +146,7 @@ export default function ChildCategory({
                                 )}
                               </div>
                               <div className="mt-6">
-                               <DishQuantityButton dishData={dish} />
+                                <DishQuantityButton dishData={dish} />
                               </div>
                             </div>
                           ))}
@@ -114,63 +162,4 @@ export default function ChildCategory({
       ))}
     </div>
   );
-}
-{
-  /* <MenuPopup
-show={isModalOpen}
-onClose={closeModal}
->
-<div className="relative min-h-[15rem] max-h-[30rem] mb-6 overflow-auto">
-  <div className="flex h-[12rem] justify-center mx-4 mt-4">
-    <Image
-      width={350}
-      height={200}
-      src="https://storage.hipal.life/minio/assets/dae7a31d-7314-4a6b-8417-bc5e17c460bb.jpeg"
-      alt=""
-    />
-  </div>
-  <div className="text-[#002D4B] capitalize font-[500] text-xl mx-4 mt-4">
-    chicken peri peri bowl
-  </div>
-  <div className=" mx-4 flex text-[#002D4B] text-[1rem] leading-[1.25rem] mt-4">
-    <FoodType type="veg" />
-    <div>Veg</div>
-  </div>
-  <div className="text-[#002D4B] capitalize text-base mx-4 mt-4">
-    Average time 24 minutes(running on delay)
-  </div>
-  <div className="text-[#002D4B]/40 text-base mx-4 mt-2 line-clamp-3">
-    Lorem ipsum dolor sit amet consectetur
-    adipisicing elit. Magnam, quis? Lorem
-    ipsum dolor sit amet consectetur
-    adipisicing elit. Magnam, quis? Lorem
-    ipsum dolor sit amet consectetur
-    adipisicing elit. Magnam, quis?
-  </div>
-  <div className="text-[#2C62F0] flex space-x-2 capitalize text-base mx-4 mt-2">
-    <BiBowlRice className="mt-1" />
-    <span>3 portions Available</span>
-  </div>
-  <div className="text-[#002D4B]/40 text-base mx-4 mt-2 line-clamp-3">
-    Lorem ipsum dolor sit amet consectetur
-    adipisicing elit. Magnam, quis? Lorem
-    ipsum dolor sit amet consectetur
-    adipisicing elit. Magnam, quis? Lorem
-    ipsum dolor sit amet consectetur
-    adipisicing elit. Magnam, quis?
-  </div>
-  <div className="text-[#2C62F0] flex space-x-2 capitalize text-base mx-4 mt-2">
-    <BiBowlRice className="mt-1" />
-    <span>3 portions Available</span>
-  </div>
-  <div className="text-[#002D4B]/40 text-base mx-4 mt-2 line-clamp-3">
-    Lorem ipsum dolor sit amet consectetur
-    adipisicing elit. Magnam, quis? Lorem
-    ipsum dolor sit amet consectetur
-    adipisicing elit. Magnam, quis? Lorem
-    ipsum dolor sit amet consectetur
-    adipisicing elit. Magnam, quis?
-  </div>
-</div>
-</MenuPopup> */
 }

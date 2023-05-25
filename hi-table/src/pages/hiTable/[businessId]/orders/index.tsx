@@ -26,7 +26,6 @@ function Orders() {
   };
 
   const acceptOrder = async (id: string) => {
-    console.log(id);
     try {
       await axios.put(`https://api.hipal.life/v1/kitchens/waiterKot/update/${id}`);
       setOrderAccepted(true);

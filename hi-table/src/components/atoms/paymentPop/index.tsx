@@ -15,8 +15,8 @@ export default function PaymentPopup({
     <>
       <Transition appear show={show} as={Fragment}>
         <Dialog as="div" className="relative z-50" onClose={onClose}>
-          <div className="fixed bottom-[4rem] mx-auto overflow-y-auto backdrop-blur">
-            <div className="w-screen h-[15rem]"></div>
+          <div className="fixed bottom-0 mx-auto overflow-y-auto bg-black/20 backdrop-blur">
+            <div className="w-screen h-[25rem]"></div>
             <div className="flex min-h-full text-center">
               <Transition.Child
                 as={Fragment}
@@ -40,6 +40,7 @@ export default function PaymentPopup({
                   </div>
                   {children}
                 </Dialog.Panel>
+                
               </Transition.Child>
             </div>
           </div>

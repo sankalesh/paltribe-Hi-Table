@@ -274,3 +274,40 @@ export interface IPortion {
   discount: string;
   default: boolean | string;
 }
+
+
+export interface IKot {
+  businessId: string;
+  kitchenId: string;
+  zoneId: string;
+  tableId: string;
+  staffId: string;
+  startedAt: number;
+  cookedAt: number;
+  status: string;
+  dish: {
+    dishId: string;
+    name: string;
+    price: number;
+    qty: number;
+    comments: string;
+    extras: {
+      name: string;
+      price: string;
+      qty: number;
+    }[];
+    portions: {
+      name: string;
+      price: string;
+      discount: string;
+      default: string;
+    };
+  };
+  customerName: string;
+  customerPhone: string;
+  dishStatus: string;
+  kotTime: string;
+  tableName: string;
+  date: string;
+  id: string;
+}

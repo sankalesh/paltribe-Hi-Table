@@ -1,8 +1,9 @@
 import { useCart } from '@/components/store/useCart'
+import { IDish } from '@/components/types/hiTableData'
 import { getPrice } from '@/components/utils/helpers'
 import { memo, useMemo } from 'react'
 
-function ChoosePortions({ dishData }) {
+function ChoosePortions({ dishData }:{dishData:IDish}) {
 	const { cart, setCart } = useCart()
 	const portions = useMemo(() => dishData?.portions || [], [dishData])
 
