@@ -12,6 +12,10 @@ import axios from "axios";
 import HiPalLogo from "../../../../../assets/svg/hipalLogoNew.svg";
 
 import Image from "next/image";
+import { useLogin } from "@/components/store/useLogin";
+import Link from "next/link";
+import { PAGE_TYPES, routePaths } from "@/components/utils/routes";
+import { ITable, useTable } from "@/components/store/useTable";
 
 interface IZone {
   businessId: string;
@@ -45,12 +49,75 @@ const filterButtons = [
   },
 ];
 
+const classByStatus: { [key: string]: any } = {
+  ["occupied"]: {
+    classNames:
+      "relative h-[5.75rem] mx-6 mb-4 border border-[#e1e1e1]/50 rounded-xl bg-[#E3EFFF]",
+    businessNameClasses:
+      "absolute font-[500] capitalize truncate left-6 top-9 w-[50%]",
+    tableClasses: "right-8 top-6 absolute text-[1rem] opacity-50",
+    numberClasses:
+      "absolute right-6 bottom-6 text-sm font-[500] text-[#2C62F0]",
+  },
+  ["reserved"]: {
+    classNames:
+      "relative h-[3.75rem]  mx-6 mb-4 border border-[#e1e1e1]/50 rounded-xl bg-gray-200",
+    businessNameClasses:
+      "absolute font-[500] capitalize truncate left-6 top-2 w-[50%]",
+    tableClasses: "right-8 top-2 absolute text-[1rem] opacity-50",
+    numberClasses:
+      "absolute right-6 bottom-2 text-sm font-[500] text-[#2C62F0]",
+  },
+  ["empty"]: {
+    classNames:
+      "relative h-[3.75rem]  mx-6 mb-4 border border-[#e1e1e1]/50 rounded-xl bg-white",
+    businessNameClasses:
+      "absolute font-[500] capitalize truncate left-6 top-2 w-[50%]",
+    tableClasses: "right-8 top-2 absolute text-[1rem] opacity-50",
+    numberClasses:
+      "absolute right-6 bottom-2 text-sm font-[500] text-[#2C62F0]",
+  },
+  ["activate"]: {
+    classNames:
+      "relative h-[5.75rem] mx-6 mb-4 border border-[#e1e1e1]/50 rounded-xl bg-[#DBFFE2]",
+    businessNameClasses:
+      "absolute font-[500] capitalize truncate left-6 top-9 w-[50%]",
+    tableClasses: "right-8 top-6 absolute text-[1rem] opacity-50",
+    numberClasses:
+      "absolute right-6 bottom-6 text-sm font-[500] text-[#2C62F0]",
+  },
+  ["settled"]: {
+    classNames:
+      "relative h-[5.75rem] mx-6 mb-4 border border-[#e1e1e1]/50 rounded-xl bg-[#FFF3D3]",
+    businessNameClasses:
+      "absolute font-[500] capitalize truncate left-6 top-9 w-[50%]",
+    tableClasses: "right-8 top-6 absolute text-[1rem] opacity-50",
+    numberClasses:
+      "absolute right-6 bottom-6 text-sm font-[500] text-[#2C62F0]",
+  },
+  ["need assistance"]: {
+    classNames:
+      "relative h-[5.75rem]  mx-6 mb-4 border border-[#e1e1e1]/50 rounded-xl bg-[#FFE5E5]",
+    businessNameClasses:
+      "absolute font-[500] capitalize truncate left-6 top-9 w-[50%]",
+    tableClasses: "right-8 top-6 absolute text-[1rem] opacity-50",
+    numberClasses:
+      "absolute right-6 bottom-6 text-sm font-[500] text-[#2C62F0]",
+  },
+};
+
 function Table() {
   const [zoneData, setZoneData] = useState<IZone[]>([]);
   const [search, setSearch] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [activeButton, setActiveButton] = useState("");
   const searchRef = useRef(null);
+  const userDetails = useLogin((s) => s.userDetails);
+  const kitchenId = useLogin((s) => s.kitchenId);
+  const setKitchenId = useLogin((s) => s.setKitchenId);
+  const setTableData = useTable((s) => s.setTableData);
+  const tableData = useTable((s) => s.tableData);
+  console.log(tableData);
 
   const router = useRouter();
 
@@ -58,7 +125,6 @@ function Table() {
     businessId: string;
     zoneId: string;
   };
-  console.log(businessId, zoneId);
 
   const popOver = (search = "") => {
     if (search.length > 0) {
@@ -78,6 +144,7 @@ function Table() {
   const handleOnclick = (str: any) => {
     str = activeButton.length === 0 ? str : "";
     setActiveButton(str);
+    console.log(str);
 
     if (str.length > 0) {
       setZoneData(
@@ -87,7 +154,8 @@ function Table() {
       );
       return;
     }
-    setZoneData(zoneData);
+    // setZoneData(zoneData);
+    result();
   };
 
   // const handleClickOutside = (event:any) => {
@@ -111,60 +179,23 @@ function Table() {
 
   const result = async () => {
     const response = await axios.get(
-      `https://api.hipal.life/v1/zones/${zoneId}/tables?businessId=${businessId}`
+      `https://api.hipal.life/v1/zones/${zoneId}/tables/ByWaiter?businessId=${businessId}&staffId=${userDetails?.id}`
     );
-    const res = response.data;
-    setZoneData(res);
+    const res = await response.data;
     console.log(res);
+    setZoneData(res);
+
+    const kitchen = await axios.get(
+      `https://api.hipal.life/v1/kitchens?businessId=${businessId}`
+    );
+    const kitchenData = await kitchen.data;
+    const id = kitchenData.map((ele: any) => ele.id) as string;
+    setKitchenId(id.toString());
+  };
+  const handleTableClick = (tableData:any) => {
+    setTableData(tableData);
   };
 
-  const classByStatus = {
-    occupied: {
-      classNames:
-        "relative h-[5.75rem] mx-6 mb-4 border border-[#e1e1e1]/50 rounded-xl bg-[#E3EFFF]",
-      businessNameClasses:
-        "absolute font-[500] capitalize truncate left-6 top-9 w-[50%]",
-      tableClasses: "right-8 top-6 absolute text-[1rem] opacity-50",
-      numberClasses:
-        "absolute right-6 bottom-6 text-sm font-[500] text-[#2C62F0]",
-    },
-    reserved: {
-      classNames:
-        "relative h-[3.75rem]  mx-6 mb-4 border border-[#e1e1e1]/50 rounded-xl bg-gray-200",
-      businessNameClasses:
-        "absolute font-[500] capitalize truncate left-6 top-2 w-[50%]",
-      tableClasses: "right-8 top-2 absolute text-[1rem] opacity-50",
-      numberClasses:
-        "absolute right-6 bottom-2 text-sm font-[500] text-[#2C62F0]",
-    },
-    empty: {
-      classNames:
-        "relative h-[3.75rem]  mx-6 mb-4 border border-[#e1e1e1]/50 rounded-xl bg-[#DBFFE2]",
-      businessNameClasses:
-        "absolute font-[500] capitalize truncate left-6 top-2 w-[50%]",
-      tableClasses: "right-8 top-2 absolute text-[1rem] opacity-50",
-      numberClasses:
-        "absolute right-6 bottom-2 text-sm font-[500] text-[#2C62F0]",
-    },
-    settled: {
-      classNames:
-        "relative h-[5.75rem] mx-6 mb-4 border border-[#e1e1e1]/50 rounded-xl bg-[#FFF3D3]",
-      businessNameClasses:
-        "absolute font-[500] capitalize truncate left-6 top-9 w-[50%]",
-      tableClasses: "right-8 top-6 absolute text-[1rem] opacity-50",
-      numberClasses:
-        "absolute right-6 bottom-6 text-sm font-[500] text-[#2C62F0]",
-    },
-    ["need assistance"]: {
-      classNames:
-        "relative h-[5.75rem]  mx-6 mb-4 border border-[#e1e1e1]/50 rounded-xl bg-[#FFE5E5]",
-      businessNameClasses:
-        "absolute font-[500] capitalize truncate left-6 top-9 w-[50%]",
-      tableClasses: "right-8 top-6 absolute text-[1rem] opacity-50",
-      numberClasses:
-        "absolute right-6 bottom-6 text-sm font-[500] text-[#2C62F0]",
-    },
-  };
   const searchData: IZone[] = zoneData.filter(
     (ele) =>
       ele?.name?.toLowerCase()?.includes(search?.toLowerCase()) ||
@@ -247,145 +278,164 @@ function Table() {
         {searchData.length > 0 ? (
           <div>
             {searchData.map((ele, index) => (
-              <div
-                key={index}
-                className={`${
-                  classByStatus[ele?.status?.toLowerCase()]?.classNames
-                }`}
+              <Link
+                key={ele.id + zoneId + "search" + index}
+                href={`${routePaths[PAGE_TYPES.SINGLE_TABLE](
+                  businessId,
+                  zoneId,
+                  ele?.id
+                )}`}
+                passHref
               >
                 <div
+                 onClick={() => handleTableClick(ele)}
                   className={`${
-                    classByStatus[ele?.status?.toLowerCase()]
-                      ?.businessNameClasses
+                    classByStatus[ele?.status?.toLowerCase()]?.classNames
                   }`}
                 >
-                  {ele.name}
-                </div>
-                <MdOutlinePeopleOutline
-                  className={`${
-                    classByStatus[ele?.status?.toLowerCase()]?.tableClasses
-                  }`}
-                />
-                <div
-                  className={`${
-                    classByStatus[ele?.status?.toLowerCase()].numberClasses
-                  }`}
-                >
-                  {ele?.activeUser < 10
-                    ? `0${ele?.activeUser}`
-                    : ele?.activeUser == null
-                    ? "00"
-                    : ele?.activeUser}
-                  /{ele?.capacity < 10 ? `0${ele?.capacity}` : ele?.capacity}
-                </div>
-                {ele?.status?.toLowerCase() !== "empty" &&
-                  ele?.status?.toLowerCase() !== "reserved" && (
-                    <div>
-                      <div className="absolute top-3 left-6 text-sm font-[500] text-[#2C62F0]">
-                        {ele?.time}
+                  <div
+                    className={`${
+                      classByStatus[ele?.status?.toLowerCase()]
+                        ?.businessNameClasses
+                    }`}
+                  >
+                    {ele.name}
+                  </div>
+                  <MdOutlinePeopleOutline
+                    className={`${
+                      classByStatus[ele?.status?.toLowerCase()]?.tableClasses
+                    }`}
+                  />
+                  <div
+                    className={`${
+                      classByStatus[ele?.status?.toLowerCase()]?.numberClasses
+                    }`}
+                  >
+                    {ele?.activeUser < 10
+                      ? `0${ele?.activeUser}`
+                      : ele?.activeUser == null
+                      ? "00"
+                      : ele?.activeUser}
+                    /{ele?.capacity < 10 ? `0${ele?.capacity}` : ele?.capacity}
+                  </div>
+                  {ele?.status?.toLowerCase() !== "empty" &&
+                    ele?.status?.toLowerCase() !== "reserved" &&
+                    ele?.status?.toLowerCase() !== "occupied" && (
+                      <div>
+                        <div className="absolute top-3 left-6 text-sm font-[500] text-[#2C62F0]">
+                          {ele?.time ? ele?.time : "10.00"}
+                        </div>
                       </div>
-                    </div>
-                  )}
-                <div className="absolute bottom-2 left-6 capitalize font-normal text-[#002D4B]/40 text-[0.875rem] leading-[1rem]">
-                  {ele.status}
-                </div>
+                    )}
+                  <div className="absolute bottom-2 left-6 capitalize font-normal text-[#002D4B]/40 text-[0.875rem] leading-[1rem]">
+                    {ele.status}
+                  </div>
 
-                {ele?.status?.toLowerCase() !== "empty" &&
-                  ele?.status?.toLowerCase() !== "reserved" && (
-                    <div>
-                      <MdOutlineDinnerDining
-                        className={`right-[5.5rem] top-6 absolute text-[1rem] opacity-50`}
-                      />
-                      <div
-                        className={`absolute right-20 bottom-6 text-sm font-[500] text-[#2C62F0]`}
-                      >
-                        {ele?.activeUser < 10
-                          ? `0${ele?.activeUser}`
-                          : ele?.activeUser == null
-                          ? "00"
-                          : ele?.activeUser}
-                        /
-                        {ele?.capacity < 10
-                          ? `0${ele?.capacity}`
-                          : ele?.capacity}
+                  {ele?.status?.toLowerCase() !== "empty" &&
+                    ele?.status?.toLowerCase() !== "reserved" &&
+                    ele?.status?.toLowerCase() !== "occupied" && (
+                      <div>
+                        <MdOutlineDinnerDining
+                          className={`right-[5.5rem] top-6 absolute text-[1rem] opacity-50`}
+                        />
+                        <div
+                          className={`absolute right-20 bottom-6 text-sm font-[500] text-[#2C62F0]`}
+                        >
+                          {ele?.activeUser < 10
+                            ? `0${ele?.activeUser}`
+                            : ele?.activeUser == null
+                            ? "00"
+                            : ele?.activeUser}
+                          /
+                          {ele?.capacity < 10
+                            ? `0${ele?.capacity}`
+                            : ele?.capacity}
+                        </div>
                       </div>
-                    </div>
-                  )}
-              </div>
+                    )}
+                </div>
+              </Link>
             ))}
-          </div>
-        ) : searchData.length == 0 ? (
-          <div className="text-center text-[2rem] bg-[#f5f5f5] h-screen mt-[4rem]">
-            There are no Tables
           </div>
         ) : (
           <div>
             {zoneData.map((ele, index) => (
-              <div
-                key={index}
-                className={`${
-                  classByStatus[ele?.status?.toLowerCase()]?.classNames
-                }`}
+              <Link
+                key={ele.id + zoneId + "zone" + index}
+                href={`${routePaths[PAGE_TYPES.SINGLE_TABLE](
+                  businessId,
+                  zoneId,
+                  ele?.id
+                )}`}
+                passHref
               >
                 <div
+                  key={index}
+                  onClick={() => handleTableClick(ele)}
                   className={`${
-                    classByStatus[ele?.status?.toLowerCase()]
-                      ?.businessNameClasses
+                    classByStatus[ele?.status?.toLowerCase()]?.classNames
                   }`}
                 >
-                  {ele.name}
-                </div>
-                <MdOutlinePeopleOutline
-                  className={`${
-                    classByStatus[ele?.status?.toLowerCase()]?.tableClasses
-                  }`}
-                />
-                <div
-                  className={`${
-                    classByStatus[ele?.status?.toLowerCase()]?.numberClasses
-                  }`}
-                >
-                  {ele?.activeUser < 10
-                    ? `0${ele?.activeUser}`
-                    : ele?.activeUser == null
-                    ? "00"
-                    : ele?.activeUser}
-                  /{ele?.capacity < 10 ? `0${ele?.capacity}` : ele?.capacity}
-                </div>
-                {ele?.status.toLowerCase() !== "empty" &&
-                  ele?.status.toLowerCase() !== "reserved" && (
-                    <div>
-                      <div className="absolute top-3 left-6 text-sm font-[500] text-[#2C62F0]">
-                        10:00
+                  <div
+                    className={`${
+                      classByStatus[ele?.status?.toLowerCase()]
+                        ?.businessNameClasses
+                    }`}
+                  >
+                    {ele.name}
+                  </div>
+                  <MdOutlinePeopleOutline
+                    className={`${
+                      classByStatus[ele?.status?.toLowerCase()]?.tableClasses
+                    }`}
+                  />
+                  <div
+                    className={`${
+                      classByStatus[ele?.status?.toLowerCase()]?.numberClasses
+                    }`}
+                  >
+                    {ele?.activeUser < 10
+                      ? `0${ele?.activeUser}`
+                      : ele?.activeUser == null
+                      ? "00"
+                      : ele?.activeUser}
+                    /{ele?.capacity < 10 ? `0${ele?.capacity}` : ele?.capacity}
+                  </div>
+                  {ele?.status.toLowerCase() !== "empty" &&
+                    ele?.status.toLowerCase() !== "reserved" && (
+                      <div>
+                        <div className="absolute top-3 left-6 text-sm font-[500] text-[#2C62F0]">
+                          10:00
+                        </div>
                       </div>
-                    </div>
-                  )}
-                <div className="absolute bottom-2 left-6 capitalize font-semibold text-[#002D4B]/40 text-[0.875rem] leading-[1rem]">
-                  {ele?.status}
-                </div>
+                    )}
+                  <div className="absolute bottom-2 left-6 capitalize font-semibold text-[#002D4B]/40 text-[0.875rem] leading-[1rem]">
+                    {ele?.status}
+                  </div>
 
-                {ele?.status.toLowerCase() !== "empty" &&
-                  ele?.status.toLowerCase() !== "reserved" && (
-                    <div>
-                      <MdOutlineDinnerDining
-                        className={`right-[5.5rem] top-6 absolute text-[1rem] opacity-50`}
-                      />
-                      <div
-                        className={`absolute right-20 bottom-6 text-sm font-[500] text-[#2C62F0]`}
-                      >
-                        {ele?.activeUser < 10
-                          ? `0${ele?.activeUser}`
-                          : ele?.activeUser == null
-                          ? "00"
-                          : ele?.activeUser}
-                        /
-                        {ele?.capacity < 10
-                          ? `0${ele?.capacity}`
-                          : ele?.capacity}
+                  {ele?.status.toLowerCase() !== "empty" &&
+                    ele?.status.toLowerCase() !== "reserved" && (
+                      <div>
+                        <MdOutlineDinnerDining
+                          className={`right-[5.5rem] top-6 absolute text-[1rem] opacity-50`}
+                        />
+                        <div
+                          className={`absolute right-20 bottom-6 text-sm font-[500] text-[#2C62F0]`}
+                        >
+                          {ele?.activeUser < 10
+                            ? `0${ele?.activeUser}`
+                            : ele?.activeUser == null
+                            ? "00"
+                            : ele?.activeUser}
+                          /
+                          {ele?.capacity < 10
+                            ? `0${ele?.capacity}`
+                            : ele?.capacity}
+                        </div>
                       </div>
-                    </div>
-                  )}
-              </div>
+                    )}
+                </div>
+              </Link>
             ))}
           </div>
         )}

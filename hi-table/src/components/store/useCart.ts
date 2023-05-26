@@ -9,8 +9,10 @@ export interface ICartExtra {
 }
 
 export interface ICartVariant {
+    id:string
   extra?: ICartExtra | {};
   portion?: IPortion;
+  quantity?: number;
 }
 
 export interface ICartDish {

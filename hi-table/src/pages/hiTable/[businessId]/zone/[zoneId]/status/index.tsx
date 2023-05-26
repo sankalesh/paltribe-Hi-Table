@@ -10,11 +10,12 @@ import { GiCampCookingPot } from "react-icons/gi";
 import { BiBowlRice } from "react-icons/bi";
 import Modal from "@/components/molecules/popup";
 import Popup from "@/components/molecules/popup";
-import HiPalLogo from "../../../../assets/svg/hipalLogoNew.svg";
+import HiPalLogo from "../../../../../../assets/svg/hipalLogoNew.svg";
 import Image from "next/image";
 import axios from "axios";
 import { useRouter } from "next/router";
 import { IKot, IStatus } from "@/components/types/hiTableData";
+import { useLogin } from "@/components/store/useLogin";
 
 function Status() {
   const [filterClicked, setFilterClicked] = useState(false);
@@ -26,8 +27,13 @@ function Status() {
   const [selectedDishStatus, setSelectedDishStatus] = useState<IKot | null>(
     null
   );
+  const kitchenId = useLogin((state) => state.kitchenId);
+  const userDetails = useLogin((state) => state.userDetails);
   const router = useRouter();
-  const { businessId } = router.query as { businessId: string };
+  const { businessId, zoneId } = router.query as {
+    businessId: string;
+    zoneId: string;
+  };
 
   const openModal = (kot: IKot) => {
     console.log(kot);
@@ -104,13 +110,27 @@ function Status() {
     },
   ];
 
+  const handleDishStatus = async(kotId:any) => {
+    console.log(kotId);
+    let config = {
+      method:'put',
+      url:'https://api.hipal.life/v1/kitchens/update/kots/dish',
+      data:{
+        kots:[kotId]
+      }
+    }
+    const res = await axios(config);
+    getAllStatusData()
+    closeModal()
+  };
+
   useEffect(() => {
     getAllStatusData();
   }, []);
 
   async function getAllStatusData() {
     const response = await axios.get(
-      `https://api.hipal.life/v1/kitchens/6461cf5d4726205e689e1471/getAllKotByWaiter/all?businessId=${businessId}&staffId=5`
+      `https://api.hipal.life/v1/kitchens/${kitchenId}/getAllKotByWaiter/all?businessId=${businessId}&kitchenId=${kitchenId}&zoneId=${zoneId}&staffId=${userDetails?.id}`
     );
     const data = response.data;
     setStatusData(data);
@@ -201,7 +221,9 @@ function Status() {
                 <div key={ele?.id} className="mx-6 mb-6 bg-white rounded-2xl">
                   <div className="flex justify-between pt-4 mx-4">
                     <div className="flex flex-col">
-                      <div className="font-[500] capitalize">T-{i}</div>
+                      <div className="font-[500] capitalize">
+                        {ele?.tableName || "T-01"}
+                      </div>
                       <div className="capitalize font-normal text-[#002D4B]/40 text-[0.875rem] mt-1 leading-[1rem]">
                         {kot?.customerName}
                       </div>
@@ -281,7 +303,7 @@ function Status() {
                                       <BiBowlRice className="mt-1 ml-1 text-white" />
                                     </div>
                                     <div className="mb-[0.1rem] capitalize font-[500] text-lg text-[#00BA34]/80 pr-1 pl-1 ml-6 mr-4">
-                                      {selectedDishStatus?.dishStatus} x 1
+                                      {selectedDishStatus?.dishStatus}
                                     </div>
                                   </div>
                                 </button>
@@ -294,7 +316,7 @@ function Status() {
                                       <BiBowlRice className="mt-1 ml-1 text-white" />
                                     </div>
                                     <div className="mb-[0.1rem] capitalize font-[500] text-lg text-[#5591FF]/80 pr-1 pl-1 ml-6 mr-4">
-                                      {selectedDishStatus?.dishStatus} x 1
+                                      {selectedDishStatus?.dishStatus}
                                     </div>
                                   </div>
                                 </button>
@@ -307,12 +329,20 @@ function Status() {
                                       <BiBowlRice className="mt-1 ml-1 text-white" />
                                     </div>
                                     <div className="mb-[0.1rem] capitalize font-[500] text-lg text-[#FFC318]/80 pr-1 pl-1 ml-6 mr-4">
-                                      {selectedDishStatus?.dishStatus} x 1
+                                      {selectedDishStatus?.dishStatus}
                                     </div>
                                   </div>
                                 </button>
                               </div>
                             )}
+                            <div className="fixed bottom-0 z-20 w-full py-2 mx-6 shadow-lg shadow-base-100">
+                              <button
+                                onClick={() => handleDishStatus(selectedDishStatus?.id)}
+                                className="py-4 w-[85%] space-x-2 text-white bg-[#2C62F0] rounded-full"
+                              >
+                                Mark as delivered
+                              </button>
+                            </div>
                           </div>
                         </Popup>
                       </div>
@@ -324,7 +354,7 @@ function Status() {
                                 <BiBowlRice className="mt-1 ml-1 text-white" />
                               </div>
                               <div className="mb-[0.1rem] capitalize font-[500] text-lg text-[#00BA34]/80 pr-1 pl-1 ml-6 mr-4">
-                                {kot?.dishStatus} x 1
+                                {kot?.dishStatus}
                               </div>
                             </div>
                           </button>
@@ -337,7 +367,7 @@ function Status() {
                                 <BiBowlRice className="mt-1 ml-1 text-white" />
                               </div>
                               <div className="mb-[0.1rem] capitalize font-[500] text-lg text-[#5591FF]/80 pr-1 pl-1 ml-6 mr-4">
-                                {kot?.dishStatus} x 1
+                                {kot?.dishStatus}
                               </div>
                             </div>
                           </button>
@@ -350,7 +380,7 @@ function Status() {
                                 <BiBowlRice className="mt-1 ml-1 text-white" />
                               </div>
                               <div className="mb-[0.1rem] capitalize font-[500] text-lg text-[#FFC318]/80 pr-1 pl-1 ml-6 mr-4">
-                                {kot?.dishStatus} x 1
+                                {kot?.dishStatus}
                               </div>
                             </div>
                           </button>

@@ -31,7 +31,8 @@ export default function ChildCategory({
   return (
     <div className="relative w-full px-6 mt-6">
       {childCategories?.map((category) => (
-        <div
+        <section
+        id={category?.id}
           key={category?.id}
           className="w-full max-w-md p-4 mx-auto mt-6 bg-white rounded-2xl"
         >
@@ -158,7 +159,7 @@ export default function ChildCategory({
               </>
             )}
           </Disclosure>
-        </div>
+        </section>
       ))}
     </div>
   );

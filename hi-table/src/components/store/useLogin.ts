@@ -18,6 +18,7 @@ interface IUseLogin {
           customRoleId: string;
         }[];
       };
+      kitchenId?: string;
 
     setPhoneNumber: (d: string) => void
     setName: (d: string) => void
@@ -25,6 +26,7 @@ interface IUseLogin {
     setPassword: (d: string) => void
     setTime:(d: string) => void
     setUserDetails:(d:any) => void
+    setKitchenId: (d: string) => void
 }
 
 export const useLogin = create(
@@ -36,6 +38,7 @@ export const useLogin = create(
             password: '',
             time:'',
             userDetails:{},
+            kitchenId:'',
 
             setPhoneNumber: (d: string) => set({ phoneNumber: d }),
             setName: (d: string) => set({ name: d }),
@@ -43,6 +46,7 @@ export const useLogin = create(
             setPassword: (d: string) => set({ password: d }),
             setTime:(d:string)=>set({time:d}),
             setUserDetails:(d:any) =>set({userDetails :d}),
+            setKitchenId:(d:string) =>set({kitchenId:d}),
         }),
         {
             name: 'useLogin',

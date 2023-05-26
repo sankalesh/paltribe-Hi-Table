@@ -26,23 +26,45 @@ function Zones() {
   const [zones, setZones] = useState<IZone[]>([]);
   const [isToggled, setIsToggled] = useState(false);
   const { time, setTime } = useLogin();
+  const [loggedIn, setLoggedIn] = useState(false);
   const router = useRouter();
-  const { businessId } = router.query as {businessId: string}
+  const { businessId, zoneId } = router.query as {
+    businessId: string;
+    zoneId: string;
+  };
+console.log(time)
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout;
+
+    if (isToggled) {
+      intervalId = setInterval(() => {
+        const currTime = moment().format("h:mm A");
+        setTime(currTime);
+      }, 10000); 
+    }
+
+    return () => {
+      clearInterval(intervalId); // Cleanup the interval when component unmounts or toggle is turned off
+    };
+  }, [isToggled]);
 
   const handleToggle = () => {
-    setIsToggled(!isToggled);
-    const currTime = moment().format("h.mm A");
-    setTime(currTime);
+    if (isToggled) {
+      setIsToggled(false);
+      setLoggedIn(false);
+    } else {
+      setIsToggled(true);
+      setLoggedIn(true);
+    }
   };
 
-  
-  
   useEffect(() => {
     if (businessId) {
+      console.log(businessId);
       result();
     }
   }, [businessId]);
-  
+
   const result = async () => {
     try {
       const response = await axios.get(
@@ -90,6 +112,7 @@ function Zones() {
                 isToggled ? "" : ""
               }`}
               onClick={handleToggle}
+              
             >
               <span
                 className={`absolute top-0.5 left-[0.125rem] bottom-0.5 w-[49.5%] h-7 transform transition-transform duration-300 ease-in-out rounded-xl ${
@@ -122,40 +145,42 @@ function Zones() {
       </span>
 
       {zones?.map((ele, index) => (
-          
-          <Link key={index} href={`${routePaths.tables(businessId,ele.id)}`} passHref>
-        <div
-          
-          className={`relative h-[5.75rem] mx-6 my-4 border border-[#e1e1e1]/50 rounded-xl ${
-            isToggled ? "bg-white" : "bg-gray-200"
-          }`}
+        <Link
+          key={index}
+          href={`${routePaths.tables(businessId, ele.id)}`}
+          passHref
         >
           <div
-            className={`absolute truncate left-6 top-8 w-[70%]  ${
-              isToggled ? "font-[500]" : "font-[500] text-gray-400"
-            }`}
-          >
-            {ele.zoneName}
-          </div>
-          <MdTableRestaurant
-            className={`right-8 top-6 absolute text-[1rem] opacity-50 ${
+            className={`relative h-[5.75rem] mx-6 my-4 border border-[#e1e1e1]/50 rounded-xl ${
               isToggled ? "bg-white" : "bg-gray-200"
             }`}
-          />
-          <div
-            className={`absolute right-6 bottom-6 text-sm font-[500]  ${
-              isToggled
-                ? "bg-white text-[#2C62F0]"
-                : "bg-gray-200 text-gray-400"
-            }`}
           >
-            {ele?.Occupied < 10 ? "0" + ele?.Occupied : ele?.Occupied}/
-            {ele?.tables?.length < 10
-              ? `0${ele?.tables?.length}`
-              : ele?.tables?.length}
+            <div
+              className={`absolute truncate left-6 top-8 w-[70%]  ${
+                isToggled ? "font-[500]" : "font-[500] text-gray-400"
+              }`}
+            >
+              {ele.zoneName}
+            </div>
+            <MdTableRestaurant
+              className={`right-8 top-6 absolute text-[1rem] opacity-50 ${
+                isToggled ? "bg-white" : "bg-gray-200"
+              }`}
+            />
+            <div
+              className={`absolute right-6 bottom-6 text-sm font-[500]  ${
+                isToggled
+                  ? "bg-white text-[#2C62F0]"
+                  : "bg-gray-200 text-gray-400"
+              }`}
+            >
+              {ele?.Occupied < 10 ? "0" + ele?.Occupied : ele?.Occupied}/
+              {ele?.tables?.length < 10
+                ? `0${ele?.tables?.length}`
+                : ele?.tables?.length}
+            </div>
           </div>
-        </div>
-      </Link>
+        </Link>
       ))}
     </div>
   );

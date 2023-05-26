@@ -2,11 +2,12 @@ import Footer from "@/components/molecules/footer";
 import Header from "@/components/molecules/header";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
-import HiPalLogo from "../../../../assets/svg/hipalLogoNew.svg";
+import HiPalLogo from "../../../../../../assets/svg/hipalLogoNew.svg";
 import { useRouter } from "next/router";
 import axios from "axios";
 import CookingAnimation from "@/components/atoms/animation";
 import { IOrder } from "@/components/types/hiTableData";
+import { useLogin } from "@/components/store/useLogin";
 
 
 
@@ -15,7 +16,8 @@ function Orders() {
   const [data, setData] = useState<IOrder[]>([]);
   const [isOrderAccepted, setOrderAccepted] = useState(false)
   const router = useRouter();
-  const { businessId } = router.query as { businessId: string };
+  const { businessId,zoneId } = router.query as {businessId: string, zoneId:string};
+  const userDetail = useLogin(s=>s.userDetails)
 
   useEffect(() => {
     result();
@@ -32,7 +34,7 @@ function Orders() {
       setTimeout(() => {
         // Navigate back to the previous page after 3 seconds
         window.history.back();
-      }, 3000);
+      }, 1000);
     } catch (error) {
       console.error('Failed to update order status:', error);
     }
@@ -41,7 +43,7 @@ function Orders() {
   const result = async () => {
     const config = {
       method: "GET",
-      url: `https://api.hipal.life/v1/kitchens/all/WaiterOrder?businessId=${businessId}`,
+      url: `https://api.hipal.life/v1/kitchens/all/WaiterOrder?businessId=${businessId}&zoneId=${zoneId}&staffId=${userDetail?.id}`,
     };
 
     const response = await axios(config);

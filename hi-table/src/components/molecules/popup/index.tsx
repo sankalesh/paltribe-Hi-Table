@@ -42,11 +42,7 @@ export default function Popup({
                   {children}
                 </Dialog.Panel>
               </Transition.Child>
-              <div className="fixed bottom-0 z-20 w-full py-2 shadow-lg shadow-base-100">
-                <button className="py-4 w-[85%] space-x-2 text-white bg-[#2C62F0] rounded-full">
-                  Mark all as delivered
-                </button>
-              </div>
+             
             </div>
           </div>
         </Dialog>

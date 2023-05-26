@@ -36,6 +36,9 @@ import DishQuantityButton from "@/components/organisms/dishDescription/dishQuant
 import FoodType from "@/components/atoms/foodType";
 import { getDishPrice } from "@/components/utils/helpers";
 import { isEmpty } from "lodash";
+import { useLogin } from "@/components/store/useLogin";
+import { useTable } from "@/components/store/useTable";
+import { PAGE_TYPES, routePaths } from "@/components/utils/routes";
 
 const headerButton = [
   {
@@ -68,8 +71,14 @@ function POS() {
   const [footButton, setFootButton] = useState("");
   const cart = useCart((s) => s.cart);
   const setCart = useCart((s) => s.setCart);
+  const tableData = useTable((s) => s.tableData);
   const router = useRouter();
-  const { businessId } = router.query as { businessId: string };
+  const { businessId, zoneId, tableId } = router.query as {
+    businessId: string;
+    zoneId: string;
+    tableId: string;
+  };
+  const kitchenId = useLogin((s) => s.kitchenId);
 
   /*************************Settle part for individual**************************************/
   const [selectedDishStatus, setSelectedDishStatus] = useState<IKot | null>(
@@ -89,12 +98,25 @@ function POS() {
   const [discountMode, setDiscountMode] = useState("rupees");
   const [discount, setDiscount] = useState(0);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
-  console.log(cart);
   /********************* All functions are related to status *********************/
+
+  const handleDishStatus = async (kotId: any) => {
+    console.log(kotId);
+    let config = {
+      method: "put",
+      url: "https://api.hipal.life/v1/kitchens/update/kots/dish",
+      data: {
+        kots: [kotId],
+      },
+    };
+    const res = await axios(config);
+    getAllKotSpecificTable();
+    closeModal();
+  };
 
   async function getAllKotSpecificTable() {
     const response = await axios.get(
-      `https://api.hipal.life/v1/kitchens/646f5e2fbf0a20e565202066/kots/allKot?businessId=${businessId}&tableId=646f5e8f85b91d05bb2f5eb7&kitchenId=646f5e2fbf0a20e565202066&zoneId=646f5e6f85b91d05bb2f5eac`
+      `https://api.hipal.life/v1/kitchens/${kitchenId}/kots/allKot?businessId=${businessId}&tableId=${tableId}&kitchenId=${kitchenId}&zoneId=${zoneId}`
     );
     const kotData = response.data;
     if (!kotData) return;
@@ -148,7 +170,7 @@ function POS() {
         const filteredVariants = item.variants.filter(
           (variant) => variant.id !== variantId
         );
-  
+
         // If there are remaining variants, update the item with the filtered variants
         if (filteredVariants.length > 0) {
           return {
@@ -160,21 +182,49 @@ function POS() {
           return null;
         }
       }
-  
+
       // If the item has no variants, return the original item
       return item;
     });
-  
+
     // Remove null values (items without variants) from the updatedCartArray
     const updatedCart = updatedCartArray.filter((item) => item !== null);
-    console.log(updatedCart)
-    setCart(updatedCart.reduce((acc, item) => {
-      return {
-        ...acc,
-        [item?.dishData.id]: item,
-      };
-    }, {}));
+    console.log(updatedCart);
+    setCart(
+      updatedCart.reduce((acc, item) => {
+        return {
+          ...acc,
+          [item?.dishData.id]: item,
+        };
+      }, {})
+    );
   };
+
+  const sendCart = async () => {
+    try {
+      let config = {
+        method: "post",
+        url: "https://api.hipal.life/v1/kitchens/CreatePos/kots/Pos",
+        data: {
+          businessId: businessId,
+          kitchenId: kitchenId,
+          zoneId: zoneId,
+          tableId: tableId,
+          tableName: tableData.name,
+          cart: cart,
+        },
+      };
+      const res = await axios(config);
+      if(res.data.status){
+        alert("cart deliverd sucessfully")
+        setCart({})
+      }
+      console.log(res.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  
 
   async function getAllChildCategories() {
     const response = await axios.get(
@@ -229,6 +279,8 @@ function POS() {
                 discountValue,
                 bill?.dish?.price
               );
+              console.log('calling get billl 1')
+
               setDiscount(maxdiscountValue * selectedDishes.length);
               getBill();
               dishTotal -= maxdiscountValue;
@@ -264,6 +316,7 @@ function POS() {
                 const maxdiscountValue = Math.min(discountValue, 100);
                 const discount = (bill?.dish?.price * maxdiscountValue) / 100;
                 totalDiscount += discount;
+                console.log('calling get bill 3')
                 setDiscount(totalDiscount);
                 getBill();
                 dishTotal -= discount;
@@ -278,12 +331,12 @@ function POS() {
         if (selectedDishes.length === 0) {
           if (discountValue > 0) {
             const discount = (subTotal * discountValue) / 100;
+            getBill();
             setDiscount(discount);
-            // getBill();
             subTotal -= discount;
           }
           console.log("hey");
-          getBill();
+          
         }
       }
     }
@@ -291,14 +344,14 @@ function POS() {
 
   async function getBill() {
     const response = await axios.get(
-      `https://api.hipal.life/v1/kitchens/646f5e2fbf0a20e565202066/kots/bill?businessId=${businessId}&zoneId=646f5e6f85b91d05bb2f5eac&tableId=646f5e8f85b91d05bb2f5eb7&kitchenId=646f5e2fbf0a20e565202066&discount=${discount}&${setSelectedPaymentMethod}`
+      `https://api.hipal.life/v1/kitchens/${kitchenId}/kots/bill?businessId=${businessId}&zoneId=${zoneId}&tableId=${tableId}&kitchenId=${kitchenId}&discount=${discount}`
     );
     const billData = response.data;
+    console.log(billData)
     if (!billData) return;
     setBillData(billData);
   }
   const finalClick = async () => {
-    console.log("first");
     try {
       const config = {
         method: "put",
@@ -308,6 +361,8 @@ function POS() {
 
       const res = await axios(config);
       if (res.status) {
+        setDiscount(0)
+        router.push(routePaths[PAGE_TYPES.ZONE](businessId, zoneId))
         alert("Thank you! Visit again...");
       }
     } catch (error) {
@@ -360,9 +415,10 @@ function POS() {
   };
 
   useEffect(() => {
-    getAllChildCategories();
-  }, []);
-
+    // getAllChildCategories();
+    console.log("hello")
+    getBill()
+  }, [discount]);
 
   return (
     <div className="bg-[#f5f5f5] min-h-screen relative">
@@ -375,7 +431,7 @@ function POS() {
       >
         <Header>
           <div className="font-bold capitalize mr-4 text-[#002D4B] text-xl">
-            T-21
+            {tableData.name}
           </div>
         </Header>
         <div
@@ -541,7 +597,7 @@ function POS() {
                                         <BiBowlRice className="mt-1 ml-1 text-white" />
                                       </div>
                                       <div className="mb-[0.1rem] capitalize font-[500] text-lg text-[#00BA34]/80 pr-1 pl-1 ml-6 mr-4">
-                                        {selectedDishStatus?.dishStatus} x 1
+                                        {selectedDishStatus?.dishStatus}
                                       </div>
                                     </div>
                                   </button>
@@ -555,7 +611,7 @@ function POS() {
                                         <BiBowlRice className="mt-1 ml-1 text-white" />
                                       </div>
                                       <div className="mb-[0.1rem] capitalize font-[500] text-lg text-[#5591FF]/80 pr-1 pl-1 ml-6 mr-4">
-                                        {selectedDishStatus?.dishStatus} x 1
+                                        {selectedDishStatus?.dishStatus}
                                       </div>
                                     </div>
                                   </button>
@@ -568,12 +624,22 @@ function POS() {
                                         <BiBowlRice className="mt-1 ml-1 text-white" />
                                       </div>
                                       <div className="mb-[0.1rem] capitalize font-[500] text-lg text-[#FFC318]/80 pr-1 pl-1 ml-6 mr-4">
-                                        {selectedDishStatus?.dishStatus} x 1
+                                        {selectedDishStatus?.dishStatus}
                                       </div>
                                     </div>
                                   </button>
                                 </div>
                               )}
+                              <div className="fixed bottom-0 z-20 w-full py-2 mx-6 shadow-lg shadow-base-100">
+                                <button
+                                  onClick={() =>
+                                    handleDishStatus(selectedDishStatus?._id)
+                                  }
+                                  className="py-4 w-[85%] space-x-2 text-white bg-[#2C62F0] rounded-full"
+                                >
+                                  Mark as delivered
+                                </button>
+                              </div>
                             </div>
                           </Popup>
                         </div>
@@ -585,7 +651,7 @@ function POS() {
                                   <BiBowlRice className="mt-1 ml-1 text-white" />
                                 </div>
                                 <div className="mb-[0.1rem] capitalize font-[500] text-lg text-[#00BA34]/80 pr-1 pl-1 ml-6 mr-4">
-                                  {kot?.dishStatus} x 1
+                                  {kot?.dishStatus}
                                 </div>
                               </div>
                             </button>
@@ -598,7 +664,7 @@ function POS() {
                                   <BiBowlRice className="mt-1 ml-1 text-white" />
                                 </div>
                                 <div className="mb-[0.1rem] capitalize font-[500] text-lg text-[#5591FF]/80 pr-1 pl-1 ml-6 mr-4">
-                                  {kot?.dishStatus} x 1
+                                  {kot?.dishStatus}
                                 </div>
                               </div>
                             </button>
@@ -611,7 +677,7 @@ function POS() {
                                   <BiBowlRice className="mt-1 ml-1 text-white" />
                                 </div>
                                 <div className="mb-[0.1rem] capitalize font-[500] text-lg text-[#FFC318]/80 pr-1 pl-1 ml-6 mr-4">
-                                  {kot?.dishStatus} x 1
+                                  {kot?.dishStatus}
                                 </div>
                               </div>
                             </button>
@@ -758,8 +824,11 @@ function POS() {
                     <MdOutlineKeyboardArrowUp className="ml-3 text-xl" />
                   </button>
 
-                  <button className="absolute text-sm px-4 py-2 mr-2 font-[500] text-[#2C62F0] bg-white rounded-full right-6 bottom-3">
-                    Continue
+                  <button
+                    onClick={sendCart}
+                    className="absolute text-sm px-4 py-2 mr-2 font-[500] text-[#2C62F0] bg-white rounded-full right-6 bottom-3"
+                  >
+                    Confirm
                   </button>
                 </div>
               </div>
@@ -777,11 +846,14 @@ function POS() {
               className="absolute text-sm flex px-4 py-2 mr-2 text-white bg-[#2C62F0] rounded-full bottom-3 left-6"
             >
               <RiShoppingBagLine className="mt-[0.125rem] mr-2 -ml-4 " />
-              {Object.keys(cart).length} Items Added
+              Items Added
               <MdOutlineKeyboardArrowUp className="ml-3 text-xl" />
             </button>
 
-            <button className="absolute text-sm px-4 py-2 mr-2 font-[500] text-[#2C62F0] bg-white rounded-full right-6 bottom-3">
+            <button
+              onClick={openModal}
+              className="absolute text-sm px-4 py-2 mr-2 font-[500] text-[#2C62F0] bg-white rounded-full right-6 bottom-3"
+            >
               Continue
             </button>
           </div>
@@ -1000,6 +1072,7 @@ function POS() {
         <button
           onClick={() => {
             openModal("hey2");
+            getBill()
             footerButton("continue");
           }}
           className="absolute text-sm font-[500] px-4 py-2 mr-2 border-white border text-[#2C62F0] bg-white rounded-full right-6 bottom-3"

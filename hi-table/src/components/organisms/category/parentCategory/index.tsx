@@ -3,6 +3,7 @@ import { FiChevronDown } from "react-icons/fi";
 import { BsQuestionCircle } from "react-icons/bs";
 import FoodType from "../../../atoms/foodType";
 import { ICategory, IChildCategory } from "@/components/types/hiTableData";
+import Link from "next/link";
 
 export default function ParentCategory({
   parentCategory,
@@ -37,7 +38,10 @@ export default function ParentCategory({
                     className="py-2 text-sm text-gray-500 transition-all duration-300"
                   >
                     <div className="flex justify-between">
+                      <Link href={`#${child.id}`} passHref>
                       <div className="ml-[1.5rem]">{child?.name}</div>
+                      </Link>
+                      
                       <div className="mr-[3rem]">{child?.dishes?.length}</div>
                     </div>
                   </Disclosure.Panel>

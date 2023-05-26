@@ -4,6 +4,7 @@ import { useBottomPanel } from "@/components/store/useBottomPanel";
 import { ICart, useCart } from "@/components/store/useCart";
 import { IDish } from "@/components/types/hiTableData";
 import { memo, useCallback } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 function DishQuantityButton({
   dishData,
@@ -85,6 +86,9 @@ export function handleDishQuantity(
   closeBottomPanel: (panelName: string) => void
 ): (newQuantity: number) => void {
   return (newQuantity: number) => {
+
+    const addedDishId = uuidv4();
+    const quantity = 1;
     // Adding the dish to the cart
     if ((cart?.[dishData?.id]?.variants?.length || 0) < newQuantity) {
       // Adding the dish to the cart
@@ -102,7 +106,7 @@ export function handleDishQuantity(
       );
 
       const extra = {};
-      (dishData?.extras?.items || []).map((e) => {
+      (dishData?.extras?.[0]?.items || []).map((e) => {
         extra[e.id] = {
           ...e,
           quantity: 0,
@@ -118,6 +122,7 @@ export function handleDishQuantity(
             dishId: dishData?.id,
             variants: [
               {
+                id:addedDishId,
                 extra: {},
                 portion: portion,
               },
@@ -128,6 +133,7 @@ export function handleDishQuantity(
         // If dish is in the cart, update the variant
         const newCart = { ...cart };
         newCart[dishData?.id].variants.push({
+          id:addedDishId,
           extra: {},
           portion: portion,
         });

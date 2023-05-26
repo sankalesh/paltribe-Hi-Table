@@ -12,9 +12,10 @@ import { SiGoogleassistant } from "react-icons/si";
 import { TbToolsKitchen2 } from "react-icons/tb";
 import { ImStopwatch } from "react-icons/im";
 import Image from "next/image";
-import HiPalLogo from "../../../../assets/svg/hipalLogoNew.svg";
+import HiPalLogo from "../../../../../../assets/svg/hipalLogoNew.svg";
 import { useRouter } from "next/router";
 import axios from "axios";
+import { useLogin } from "@/components/store/useLogin";
 
 const filterButtons = [
   {
@@ -45,17 +46,25 @@ interface IAlertData {
   isAlertOn: boolean;
   id: string;
 }
-const guitarSound = new Audio("/sounds/hotel_bell.mp3");
+
+
 
 function Alert() {
   const [data, setData] = useState<IAlertData[]>([]);
   const [historyData, setHistoryData] = useState<IAlertData[]>([]);
   const [search, setSearch] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
+  const [previousLength, setPreviousLength] = useState(0);
   const [showHistory, setShowHistory] = useState(false);
   const [activeButton, setActiveButton] = useState("");
   const router = useRouter();
-  const { businessId } = router.query as { businessId: string };
+  const userDetail = useLogin((s) => s.userDetails);
+  const guitarSound = typeof window !== 'undefined' ? new Audio("/sound/hotel_bell.mp3") : null;
+
+  const { businessId, zoneId } = router.query as {
+    businessId: string;
+    zoneId: string;
+  };
 
   const handleOnclick = (str: string) => {
     str = activeButton.length === 0 ? str : "";
@@ -66,15 +75,15 @@ function Alert() {
       );
       return;
     }
-    onAlertData();
   };
 
   const handleItemClick = async (alertId: string) => {
-      const response = await axios.put(
-        `https://api.hipal.life/v1/kitchens/updateAlert/alert?alertId=${alertId}&businessId=64631183bdc46e36e2e2e1e9`
-      );
-      onAlertData();
-      offAlertData();
+    console.log(alertId);
+    const response = await axios.put(
+      `https://api.hipal.life/v1/kitchens/updateAlert/alert?alertId=${alertId}&businessId=${businessId}`
+    );
+    onAlertData2();
+    offAlertData();
   };
 
   const historyOnClick = () => {
@@ -107,11 +116,6 @@ function Alert() {
     setSearchOpen(!searchOpen);
     setSearch("");
   };
-  useEffect(() => {
-    if (data.length > 0) {
-      playGuitarSound();
-    }
-  }, []);
 
   const searchData = data.filter(
     (ele) =>
@@ -119,28 +123,59 @@ function Alert() {
       ele?.tableName?.toLowerCase().includes(search.toLowerCase()) ||
       ele?.status?.toLowerCase().includes(search.toLowerCase())
   );
-  function playGuitarSound() {
-    guitarSound.play();
-  }
 
   useEffect(() => {
-    onAlertData();
-    offAlertData();
+    const guitarSound = typeof window !== 'undefined' ? new Audio("/sound/hotel_bell.mp3") : null;
+
+
+    async function onAlertData() {
+      const response = await axios.get(
+        `https://api.hipal.life/v1/kitchens/get/AllAlertByWaiter?staffId=${userDetail?.id}&businessId=${businessId}&isAlertOn=true&zoneId=${zoneId}`
+      );
+      const data = await response.data;
+      setData(data);
+      console.log('ehy')
+
+        const newData = await response.data;
+      setData(newData);
+
+      if (newData.length > previousLength) {
+        console.log(newData.length,"this is",previousLength)
+        // guitarSound.play();
+      }
+      setPreviousLength(newData.length);
+    }
+
+    const interval = setInterval(() => {
+      onAlertData();
+    }, 10000); // Polling interval: 10 seconds
+
+    return () => {
+      clearInterval(interval); // Cleanup the interval when the component unmounts
+    };
   }, []);
-  async function onAlertData() {
+  async function onAlertData2() {
     const response = await axios.get(
-      `https://api.hipal.life/v1/kitchens/get/AllAlertByWaiter?waiterId=5&businessId=${businessId}&isAlertOn=true`
+      `https://api.hipal.life/v1/kitchens/get/AllAlertByWaiter?staffId=${userDetail?.id}&businessId=${businessId}&isAlertOn=true&zoneId=${zoneId}`
     );
     const data = await response.data;
-    console.log('datta');
     setData(data);
+
+      const newData = await response.data;
+    setData(newData);
+
+    if (newData.length > previousLength) {
+      console.log(newData.length,"this is",previousLength)
+      // guitarSound.play();
+    }
+    setPreviousLength(newData.length);
   }
+
   async function offAlertData() {
     const response = await axios.get(
-      `https://api.hipal.life/v1/kitchens/get/AllAlertByWaiter?waiterId=5&businessId=${businessId}&isAlertOn=false`
+      `https://api.hipal.life/v1/kitchens/get/AllAlertByWaiter?staffId=${userDetail?.id}&businessId=${businessId}&isAlertOn=false&zoneId=${zoneId}`
     );
     const data = await response.data;
-    console.log('datta');
     setHistoryData(data);
   }
 
@@ -293,7 +328,7 @@ function Alert() {
               className="mx-6 relative bg-gray-200 h-[4.75rem] rounded-xl"
             >
               <div className="font-bold capitalize text-[#002D4B] text-[1rem] leading-[1.25rem] absolute left-4 top-4">
-                {ele?.tableName?"":"T001"}
+                {ele?.tableName ? "" : "T001"}
               </div>
               <div className="font-normal text-[#002D4B]/40 text-[0.875rem] leading-[1rem] absolute right-4 top-4">
                 {ele?.time}

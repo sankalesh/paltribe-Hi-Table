@@ -20,7 +20,7 @@ function ExtraWithDishWithSelect({ dishData }: { dishData: IDish }) {
   const cartItem = useCart((s) => s.cart);
   const setCartItem = useCart((s) => s.setCart);
 
-  const extras = dishData?.extras?.[0].items || [];
+  const extras = dishData?.extras || [];
 
 //   const handleQuantityChange = (
 //     newQuantity,
