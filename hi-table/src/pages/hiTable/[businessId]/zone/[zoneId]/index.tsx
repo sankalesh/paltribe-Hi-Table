@@ -154,7 +154,6 @@ function Table() {
       );
       return;
     }
-    // setZoneData(zoneData);
     result();
   };
 
@@ -190,6 +189,7 @@ function Table() {
     );
     const kitchenData = await kitchen.data;
     const id = kitchenData.map((ele: any) => ele.id) as string;
+    console.log(id)
     setKitchenId(id.toString());
   };
   const handleTableClick = (tableData:any) => {
@@ -204,15 +204,15 @@ function Table() {
 
   return (
     <div className="bg-[#f5f5f5] pb-6 min-h-screen relative">
-      <Header>
-        <Image
-          className="mr-6"
-          width={68}
-          height={25}
-          src={HiPalLogo}
-          alt="Hi Table Logo"
-        />
-      </Header>
+      <Header businessId={businessId} zoneId={zoneId}>
+  <Image
+    className="mr-6"
+    width={68}
+    height={25}
+    src={HiPalLogo}
+    alt="Hi Table Logo"
+  />
+</Header>
       <div className="sticky top-0 z-50 bg-[#f5f5f5]">
         <div className="flex justify-between">
           <div
@@ -261,7 +261,7 @@ function Table() {
           {filterButtons.map(({ name, Icon, text }, index) => (
             <HeaderButton
               onClick={() => handleOnclick(name)}
-              key={index}
+              key={`${index}${name}`}
               className={
                 activeButton === name
                   ? "bg-blue-500 focus:font-[500] focus:rounded-full focus:text-[#2C62F0] focus:bg-[#2C62F0]/10 "
@@ -275,7 +275,7 @@ function Table() {
         </div>
       </div>
       <div className="mb-[4rem]">
-        {searchData.length > 0 ? (
+        {searchData.length !== 0 ? (
           <div>
             {searchData.map((ele, index) => (
               <Link
@@ -338,18 +338,18 @@ function Table() {
                         <MdOutlineDinnerDining
                           className={`right-[5.5rem] top-6 absolute text-[1rem] opacity-50`}
                         />
-                        <div
+                          <div
                           className={`absolute right-20 bottom-6 text-sm font-[500] text-[#2C62F0]`}
                         >
-                          {ele?.activeUser < 10
-                            ? `0${ele?.activeUser}`
-                            : ele?.activeUser == null
+                          {ele?.totalDishQuantity < 10
+                            ? `0${ele?.deliverdDish}`
+                            : ele?.deliverdDish == null
                             ? "00"
-                            : ele?.activeUser}
+                            : ele?.deliverdDish}
                           /
-                          {ele?.capacity < 10
-                            ? `0${ele?.capacity}`
-                            : ele?.capacity}
+                          {ele?.totalDishQuantity < 10
+                            ? `0${ele?.totalDishQuantity}`
+                            : ele?.totalDishQuantity}
                         </div>
                       </div>
                     )}
@@ -422,15 +422,15 @@ function Table() {
                         <div
                           className={`absolute right-20 bottom-6 text-sm font-[500] text-[#2C62F0]`}
                         >
-                          {ele?.activeUser < 10
-                            ? `0${ele?.activeUser}`
-                            : ele?.activeUser == null
+                          {ele?.totalDishQuantity < 10
+                            ? `0${ele?.deliverdDish}`
+                            : ele?.deliverdDish == null
                             ? "00"
-                            : ele?.activeUser}
+                            : ele?.deliverdDish}
                           /
-                          {ele?.capacity < 10
-                            ? `0${ele?.capacity}`
-                            : ele?.capacity}
+                          {ele?.totalDishQuantity < 10
+                            ? `0${ele?.totalDishQuantity}`
+                            : ele?.totalDishQuantity}
                         </div>
                       </div>
                     )}

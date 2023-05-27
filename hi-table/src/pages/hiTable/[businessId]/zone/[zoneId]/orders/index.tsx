@@ -9,19 +9,20 @@ import CookingAnimation from "@/components/atoms/animation";
 import { IOrder } from "@/components/types/hiTableData";
 import { useLogin } from "@/components/store/useLogin";
 
-
-
-
 function Orders() {
   const [data, setData] = useState<IOrder[]>([]);
-  const [isOrderAccepted, setOrderAccepted] = useState(false)
+  const [isOrderAccepted, setOrderAccepted] = useState(false);
   const router = useRouter();
-  const { businessId,zoneId } = router.query as {businessId: string, zoneId:string};
-  const userDetail = useLogin(s=>s.userDetails)
+  const { businessId, zoneId } = router.query as {
+    businessId: string;
+    zoneId: string;
+  };
+  const userDetail = useLogin((s) => s.userDetails);
 
   useEffect(() => {
     result();
   }, []);
+
   const handleAnimationComplete = () => {
     router.back();
     result();
@@ -29,17 +30,18 @@ function Orders() {
 
   const acceptOrder = async (id: string) => {
     try {
-      await axios.put(`https://api.hipal.life/v1/kitchens/waiterKot/update/${id}`);
+      await axios.put(
+        `https://api.hipal.life/v1/kitchens/waiterKot/update/${id}`
+      );
       setOrderAccepted(true);
       setTimeout(() => {
-        // Navigate back to the previous page after 3 seconds
         window.history.back();
       }, 1000);
     } catch (error) {
-      console.error('Failed to update order status:', error);
+      console.error("Failed to update order status:", error);
     }
   };
- 
+
   const result = async () => {
     const config = {
       method: "GET",
@@ -54,7 +56,7 @@ function Orders() {
 
   return (
     <div className="bg-[#f5f5f5] min-h-screen">
-      <Header>
+      <Header businessId={businessId} zoneId={zoneId}>
         <Image
           className="mr-6"
           width={68}
@@ -68,12 +70,18 @@ function Orders() {
       </div>
       {isOrderAccepted ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <CookingAnimation data={data} onAnimationComplete={handleAnimationComplete} /> 
+          <CookingAnimation
+            data={data}
+            onAnimationComplete={handleAnimationComplete}
+          />
         </div>
       ) : null}
       <div>
         {data.map((ele) => (
-          <div key={ele.id} className="bg-white mx-6 rounded-2xl mt-6 mb-[5rem]">
+          <div
+            key={ele.id}
+            className="bg-white mx-6 rounded-2xl mt-6 mb-[5rem]"
+          >
             <div className="flex justify-between pt-4 mx-4">
               <div className="flex flex-col">
                 <div className="font-[500] capitalize">T-21</div>
@@ -93,17 +101,20 @@ function Orders() {
             <div className="mx-4 mt-4 border-2 rounded-full border-gray-400/50"></div>
             <div className="relative pt-2 pb-[4.875rem]">
               {ele.items.map((item, i) => (
-                <div key={item.dish.dishId} className="flex mx-4 mt-4">
-                <div className="w-[10%] font-[500]">{item?.dish?.qty} x</div>
-                <div className="w-[80%] ml-1 font-[500]">
-                  {item?.dish?.name}
-                  <div className="capitalize font-normal text-[#002D4B]/40 text-[0.875rem] mt-1 leading-[1rem]">
-                    {item?.dish?.portions?.name}
+                <div
+                  key={item.dish.dishId + "dish" + i}
+                  className="flex mx-4 mt-4"
+                >
+                  <div className="w-[10%] font-[500]">{item?.dish?.qty} x</div>
+                  <div className="w-[80%] ml-1 font-[500]">
+                    {item?.dish?.name}
+                    <div className="capitalize font-normal text-[#002D4B]/40 text-[0.875rem] mt-1 leading-[1rem]">
+                      {item?.dish?.portions?.name}
+                    </div>
+                    <div className="capitalize font-normal text-[#002D4B]/40 text-[0.875rem] mt-1 leading-[1rem]">
+                      {item?.dish?.extras?.map((extra) => extra?.name + ", ")}
+                    </div>
                   </div>
-                  <div className="capitalize font-normal text-[#002D4B]/40 text-[0.875rem] mt-1 leading-[1rem]">
-                    {item?.dish?.extras?.map((extra) => extra?.name + ", ")}
-                  </div>
-                </div>
                 </div>
               ))}
 
@@ -111,7 +122,10 @@ function Orders() {
                 <button className="text-md font-[500] text-[#2C62F0] py-1 px-6 rounded-2xl">
                   Reject
                 </button>
-                <button onClick={()=>acceptOrder(ele.id)} className="active_on_bounce border border-[#2C62F0]  text-md font-[500] text-[#2C62F0] py-1 px-6 rounded-2xl">
+                <button
+                  onClick={() => acceptOrder(ele.id)}
+                  className="active_on_bounce border border-[#2C62F0]  text-md font-[500] text-[#2C62F0] py-1 px-6 rounded-2xl"
+                >
                   Accept
                 </button>
               </div>

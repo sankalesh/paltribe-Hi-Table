@@ -29,7 +29,7 @@ export default function ChildCategory({
     setIsModalOpen(false);
   };
   return (
-    <div className="relative w-full px-6 mt-6">
+    <div className="relative w-full px-6 pb-[5rem] mt-6 overflow-auto">
       {childCategories?.map((category) => (
         <section
         id={category?.id}
@@ -61,7 +61,7 @@ export default function ChildCategory({
                     {openChild === category?.id && (
                       <Disclosure.Panel className="pt-4 pb-2 text-sm text-gray-500 transition-all duration-300">
                         <div className="h-[0.125rem] bg-[#2C62F0]"></div>
-                        <div className="pb-[5rem]">
+                        <div className="pb-[1rem]">
                           {category?.dishes?.map((dish) => (
                             <div
                               className="relative flex justify-between mt-6"

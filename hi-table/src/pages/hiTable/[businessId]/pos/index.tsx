@@ -36,6 +36,7 @@ import DishQuantityButton from "@/components/organisms/dishDescription/dishQuant
 import FoodType from "@/components/atoms/foodType";
 import { getDishPrice } from "@/components/utils/helpers";
 import { isEmpty } from "lodash";
+import { useTable } from "@/components/store/useTable";
 
 const headerButton = [
   {
@@ -69,7 +70,10 @@ function POS() {
   const cart = useCart((s) => s.cart);
   const setCart = useCart((s) => s.setCart);
   const router = useRouter();
-  const { businessId } = router.query as { businessId: string };
+  const { businessId, zoneId } = router.query as {
+    businessId: string;
+    zoneId: string;
+  };
 
   /*************************Settle part for individual**************************************/
   const [selectedDishStatus, setSelectedDishStatus] = useState<IKot | null>(
@@ -81,6 +85,7 @@ function POS() {
   const [childCategory, setChildCategory] = useState<IChildCategory[]>([]);
   const [parentCategory, setParentCategory] = useState<ICategory[]>([]);
   const [data, setData] = useState<any>([]);
+  const tableData = useTable((s) => s.tableData);
 
   /******************************** settle part ***********************************/
   const [billData, setBillData] = useState<IStatus[]>([]);
@@ -148,7 +153,7 @@ function POS() {
         const filteredVariants = item.variants.filter(
           (variant) => variant.id !== variantId
         );
-  
+
         // If there are remaining variants, update the item with the filtered variants
         if (filteredVariants.length > 0) {
           return {
@@ -160,20 +165,22 @@ function POS() {
           return null;
         }
       }
-  
+
       // If the item has no variants, return the original item
       return item;
     });
-  
+
     // Remove null values (items without variants) from the updatedCartArray
     const updatedCart = updatedCartArray.filter((item) => item !== null);
-    console.log(updatedCart)
-    setCart(updatedCart.reduce((acc, item) => {
-      return {
-        ...acc,
-        [item?.dishData.id]: item,
-      };
-    }, {}));
+    console.log(updatedCart);
+    setCart(
+      updatedCart.reduce((acc, item) => {
+        return {
+          ...acc,
+          [item?.dishData.id]: item,
+        };
+      }, {})
+    );
   };
 
   async function getAllChildCategories() {
@@ -363,7 +370,6 @@ function POS() {
     getAllChildCategories();
   }, []);
 
-
   return (
     <div className="bg-[#f5f5f5] min-h-screen relative">
       <div
@@ -373,9 +379,9 @@ function POS() {
             : "sticky top-0 z-50 bg-[#f5f5f5]"
         } `}
       >
-        <Header>
+        <Header businessId={businessId} zoneId={zoneId}>
           <div className="font-bold capitalize mr-4 text-[#002D4B] text-xl">
-            T-21
+            {tableData.name}
           </div>
         </Header>
         <div

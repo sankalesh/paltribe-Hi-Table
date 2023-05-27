@@ -25,7 +25,8 @@ function HiTable() {
   console.log(userDetails)
 
 const router = useRouter();
-const {businessId} = router.query as {businessId:string}
+const businessId = userDetails.customRole?.[0]?.businessId;
+console.log(businessId)
 
   const handlePhoneNumberChange = (
     event: React.ChangeEvent<HTMLInputElement>

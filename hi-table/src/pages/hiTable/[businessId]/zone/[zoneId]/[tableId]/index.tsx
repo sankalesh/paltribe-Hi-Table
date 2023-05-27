@@ -113,6 +113,10 @@ function POS() {
     getAllKotSpecificTable();
     closeModal();
   };
+  useEffect(()=>{
+    getAllKotSpecificTable();
+    setActiveButton("status")
+  },[])
 
   async function getAllKotSpecificTable() {
     const response = await axios.get(
@@ -153,8 +157,9 @@ function POS() {
       price += parseFloat(portion.price);
     }
     // Add extra prices
+    console.log(selectedExtras)
     selectedExtras.map((extra, i) => {
-      price += parseFloat(extra?.price);
+      price += parseFloat(extra?.price * extra?.quantity);
     });
 
     return price.toFixed(2);
@@ -218,6 +223,7 @@ function POS() {
       if(res.data.status){
         alert("cart deliverd sucessfully")
         setCart({})
+        router.push(routePaths[PAGE_TYPES.TABLES](businessId, zoneId))
       }
       console.log(res.data);
     } catch (error) {
@@ -231,6 +237,7 @@ function POS() {
       `https://api.hipal.life/v1/categories/All/Categories?businessId=${businessId}`
     );
     const data = response.data.data;
+    console.log(data)
     if (!data) return;
     setData(data);
   }
@@ -362,8 +369,8 @@ function POS() {
       const res = await axios(config);
       if (res.status) {
         setDiscount(0)
-        router.push(routePaths[PAGE_TYPES.ZONE](businessId, zoneId))
         alert("Thank you! Visit again...");
+        router.push(routePaths[PAGE_TYPES.TABLES](businessId, zoneId))
       }
     } catch (error) {
       console.error(error);
@@ -415,8 +422,7 @@ function POS() {
   };
 
   useEffect(() => {
-    // getAllChildCategories();
-    console.log("hello")
+    getAllChildCategories();
     getBill()
   }, [discount]);
 
@@ -424,16 +430,16 @@ function POS() {
     <div className="bg-[#f5f5f5] min-h-screen relative">
       <div
         className={`${
-          activeButton.toLowerCase() === "pos"
+          activeButton.toLowerCase() === ""
             ? ""
             : "sticky top-0 z-50 bg-[#f5f5f5]"
         } `}
       >
-        <Header>
-          <div className="font-bold capitalize mr-4 text-[#002D4B] text-xl">
-            {tableData.name}
-          </div>
-        </Header>
+        <Header businessId={businessId} zoneId={zoneId}>
+  <div className="font-bold capitalize mr-4 text-[#002D4B] text-xl">
+    {tableData.name}
+  </div>
+</Header>
         <div
           className={`${
             activeButton.toLowerCase() === "status" ||
@@ -726,7 +732,7 @@ function POS() {
                   Category
                 </div>
                 <div className="absolute inset-0 pb-4 overflow-y-auto top-12">
-                  <ParentCategory parentCategory={parentCategories} />
+                  <ParentCategory closeModal={closeModal} parentCategory={parentCategories} />
                 </div>
               </div>
             </MenuPopup>

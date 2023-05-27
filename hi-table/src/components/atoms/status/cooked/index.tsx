@@ -5,7 +5,7 @@ const msg = "bxh bcbwwc  wbuiw wjcwcbw ncwikbc wjwnchwhoiww w cwc ikhwwwjw w cwc
 
 function Cooked({...props}) {
   return (
-    <div className="bg-[#2C62F0]/10 mx-6 rounded-2xl">
+    <div className="bg-[#2C62F0]/10 mx-6 rounded-2xl transition-all duration-200">
     <div className="flex justify-between">
       <div className="py-4 mx-4">
         <button

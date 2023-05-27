@@ -1,6 +1,6 @@
 import HeaderButton from "@/components/atoms/buttons/headerButton";
 import Header from "@/components/molecules/header";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useMemo  } from "react";
 import { MdAlarm } from "react-icons/md";
 import { TbToolsKitchen2 } from "react-icons/tb";
 import { SiGoogleassistant } from "react-icons/si";
@@ -16,6 +16,38 @@ import axios from "axios";
 import { useRouter } from "next/router";
 import { IKot, IStatus } from "@/components/types/hiTableData";
 import { useLogin } from "@/components/store/useLogin";
+
+const headerButton = [
+  {
+    Icon: MdAlarm,
+    text: "Delayed",
+  },
+  {
+    Icon: TbToolsKitchen2,
+    text: "Cooked",
+  },
+  {
+    Icon: SiGoogleassistant,
+    text: "Cooking",
+  },
+];
+const statusButtons = [
+  {
+    Icon: BiBowlRice,
+    status: "Delivered",
+    textColour: "#00BA34",
+  },
+  {
+    Icon: TbToolsKitchen2,
+    status: "cooked",
+    textColour: "#5591FF",
+  },
+  {
+    Icon: GiCampCookingPot,
+    status: "cooking",
+    textColour: "#00BA34",
+  },
+];
 
 function Status() {
   const [filterClicked, setFilterClicked] = useState(false);
@@ -66,49 +98,18 @@ function Status() {
     if (str.length > 0) {
       setStatusData(
         statusData?.map((ele, i) => {
-          const kot = ele[0];
+          const kot = ele?.[0];
           return ele?.filter(
-            (k) => k?.dishStatus.toLowerCase() === str.toLowerCase()
+            (k) => k?.dishStatus?.toLowerCase() === str?.toLowerCase()
           );
         })
       );
       return;
     }
     getAllStatusData();
-    setStatusData(statusData);
   };
 
-  const headerButton = [
-    {
-      Icon: MdAlarm,
-      text: "Delayed",
-    },
-    {
-      Icon: TbToolsKitchen2,
-      text: "Cooked",
-    },
-    {
-      Icon: SiGoogleassistant,
-      text: "Cooking",
-    },
-  ];
-  const statusButtons = [
-    {
-      Icon: BiBowlRice,
-      status: "Delivered",
-      textColour: "#00BA34",
-    },
-    {
-      Icon: TbToolsKitchen2,
-      status: "cooked",
-      textColour: "#5591FF",
-    },
-    {
-      Icon: GiCampCookingPot,
-      status: "cooking",
-      textColour: "#00BA34",
-    },
-  ];
+ 
 
   const handleDishStatus = async(kotId:any) => {
     console.log(kotId);
@@ -127,26 +128,36 @@ function Status() {
   useEffect(() => {
     getAllStatusData();
   }, []);
+  const filteredStatusData = useMemo(() => {
+    if (activeButton.length > 0) {
+      return statusData.map((ele) =>
+        ele?.filter((k) => k?.dishStatus?.toLowerCase() === activeButton?.toLowerCase())
+      );
+    } else {
+      return statusData;
+    }
+  }, [statusData, activeButton]);
 
   async function getAllStatusData() {
     const response = await axios.get(
       `https://api.hipal.life/v1/kitchens/${kitchenId}/getAllKotByWaiter/all?businessId=${businessId}&kitchenId=${kitchenId}&zoneId=${zoneId}&staffId=${userDetails?.id}`
     );
     const data = response.data;
+    console.log(data)
     setStatusData(data);
   }
 
   return (
     <div className="bg-[#f5f5f5] min-h-screen pb-6 relative">
-      <Header>
-        <Image
-          className="mr-6"
-          width={68}
-          height={25}
-          src={HiPalLogo}
-          alt="Hi Table Logo"
-        />
-      </Header>
+      <Header businessId={businessId} zoneId={zoneId}>
+  <Image
+    className="mr-6"
+    width={68}
+    height={25}
+    src={HiPalLogo}
+    alt="Hi Table Logo"
+  />
+</Header>
       <div className="sticky top-0 z-50 bg-[#f5f5f5]">
         <div className="flex justify-between">
           <div
@@ -211,18 +222,23 @@ function Status() {
       </div>
 
       <div className="mb-[5rem]">
-        {statusData.map((ele, i) => {
+        {filteredStatusData.map((ele, i) => {
           // Get the first element from the current sub-array
           const kot = ele[0];
+          console.log("thisn  aidbcnca ",kot)
+          if (!kot) {
+            return null; // or any placeholder component or message
+          }
+        
 
           return (
             <div>
               {ele.dishStatus !== "" && (
-                <div key={ele?.id} className="mx-6 mb-6 bg-white rounded-2xl">
+                <div key={`dishStatus${kot?.id}`} className="mx-6 mb-6 bg-white rounded-2xl">
                   <div className="flex justify-between pt-4 mx-4">
                     <div className="flex flex-col">
                       <div className="font-[500] capitalize">
-                        {ele?.tableName || "T-01"}
+                        {kot?.tableName}
                       </div>
                       <div className="capitalize font-normal text-[#002D4B]/40 text-[0.875rem] mt-1 leading-[1rem]">
                         {kot?.customerName}
@@ -239,8 +255,8 @@ function Status() {
                   </div>
 
                   <div className="mx-4 mt-4 border-2 rounded-full border-gray-400/30"></div>
-                  {ele?.map((kot) => (
-                    <div>
+                  {ele?.map((kot,i) => (
+                    <div key={`${kot?.id}kot${i}`}>
                       <div className="flex justify-between mx-4 mt-4">
                         <div className="w-[10%] font-[500]">
                           {kot?.dish?.qty} x

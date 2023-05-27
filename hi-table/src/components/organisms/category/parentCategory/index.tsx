@@ -7,10 +7,14 @@ import Link from "next/link";
 
 export default function ParentCategory({
   parentCategory,
+  closeModal,
 }: {
   parentCategory: ICategory[];
+  closeModal: () => void;
 }) {
   
+  console.log(parentCategory);
+
   return (
     <div className="relative w-full px-4">
       {parentCategory.map((ele) => (
@@ -39,7 +43,7 @@ export default function ParentCategory({
                   >
                     <div className="flex justify-between">
                       <Link href={`#${child.id}`} passHref>
-                      <div className="ml-[1.5rem]">{child?.name}</div>
+                      <div onClick={closeModal} className="ml-[1.5rem]">{child?.name}</div>
                       </Link>
                       
                       <div className="mr-[3rem]">{child?.dishes?.length}</div>
