@@ -14,7 +14,7 @@ import HiPalLogo from "../../../../../assets/svg/hipalLogoNew.svg";
 import Image from "next/image";
 import { useLogin } from "@/components/store/useLogin";
 import Link from "next/link";
-import { PAGE_TYPES, routePaths } from "@/components/utils/routes";
+import { PAGE_TYPES, newRoutes, routePaths } from "@/components/utils/routes";
 import { ITable, useTable } from "@/components/store/useTable";
 
 interface IZone {
@@ -280,7 +280,7 @@ function Table() {
             {searchData.map((ele, index) => (
               <Link
                 key={ele.id + zoneId + "search" + index}
-                href={`${routePaths[PAGE_TYPES.SINGLE_TABLE](
+                href={`${newRoutes[PAGE_TYPES.SINGLE_TABLE](
                   businessId,
                   zoneId,
                   ele?.id
@@ -362,7 +362,7 @@ function Table() {
             {zoneData.map((ele, index) => (
               <Link
                 key={ele.id + zoneId + "zone" + index}
-                href={`${routePaths[PAGE_TYPES.SINGLE_TABLE](
+                href={`${newRoutes[PAGE_TYPES.SINGLE_TABLE](
                   businessId,
                   zoneId,
                   ele?.id

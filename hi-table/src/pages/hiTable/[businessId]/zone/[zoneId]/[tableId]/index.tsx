@@ -111,10 +111,10 @@ function POS() {
     getAllKotSpecificTable();
     closeModal();
   };
-  useEffect(()=>{
+  useEffect(() => {
     getAllKotSpecificTable();
-    setActiveButton("status")
-  },[])
+    setActiveButton("status");
+  }, []);
 
   async function getAllKotSpecificTable() {
     const response = await axios.get(
@@ -155,7 +155,7 @@ function POS() {
       price += parseFloat(portion.price);
     }
     // Add extra prices
-    console.log(selectedExtras)
+    console.log(selectedExtras);
     selectedExtras.map((extra, i) => {
       price += parseFloat(extra?.price * extra?.quantity);
     });
@@ -219,24 +219,23 @@ function POS() {
         },
       };
       const res = await axios(config);
-      if(res.data.status){
-        alert("cart deliverd sucessfully")
-        setCart({})
-        router.push(routePaths[PAGE_TYPES.TABLES](businessId, zoneId))
+      if (res.data.status) {
+        alert("cart deliverd sucessfully");
+        setCart({});
+        router.push(routePaths[PAGE_TYPES.TABLES](businessId, zoneId));
       }
       console.log(res.data);
     } catch (error) {
       console.error(error);
     }
   };
-  
 
   async function getAllChildCategories() {
     const response = await axios.get(
       `https://api.hipal.life/v1/categories/All/Categories?businessId=${businessId}`
     );
     const data = response.data.data;
-    console.log(data)
+    console.log(data);
     if (!data) return;
     setData(data);
   }
@@ -285,7 +284,7 @@ function POS() {
                 discountValue,
                 bill?.dish?.price
               );
-              console.log('calling get billl 1')
+              console.log("calling get billl 1");
 
               setDiscount(maxdiscountValue * selectedDishes.length);
               getBill();
@@ -322,7 +321,7 @@ function POS() {
                 const maxdiscountValue = Math.min(discountValue, 100);
                 const discount = (bill?.dish?.price * maxdiscountValue) / 100;
                 totalDiscount += discount;
-                console.log('calling get bill 3')
+                console.log("calling get bill 3");
                 setDiscount(totalDiscount);
                 getBill();
                 dishTotal -= discount;
@@ -342,7 +341,6 @@ function POS() {
             subTotal -= discount;
           }
           console.log("hey");
-          
         }
       }
     }
@@ -366,9 +364,9 @@ function POS() {
 
       const res = await axios(config);
       if (res.status) {
-        setDiscount(0)
+        setDiscount(0);
         alert("Thank you! Visit again...");
-        router.push(routePaths[PAGE_TYPES.TABLES](businessId, zoneId))
+        router.push(routePaths[PAGE_TYPES.TABLES](businessId, zoneId));
       }
     } catch (error) {
       console.error(error);
@@ -421,7 +419,7 @@ function POS() {
 
   useEffect(() => {
     getAllChildCategories();
-    getBill()
+    getBill();
   }, [discount]);
 
   return (
@@ -434,10 +432,10 @@ function POS() {
         } `}
       >
         <Header businessId={businessId} zoneId={zoneId}>
-  <div className="font-bold capitalize mr-4 text-[#002D4B] text-xl">
-    {tableData.name}
-  </div>
-</Header>
+          <div className="font-bold capitalize mr-4 text-[#002D4B] text-xl">
+            {tableData.name}
+          </div>
+        </Header>
         <div
           className={`${
             activeButton.toLowerCase() === "status" ||
@@ -477,20 +475,20 @@ function POS() {
 
         <div className="flex items-center justify-between p-4 mx-6 mt-6 bg-white rounded-full">
           {headerButton.map((ele, i) => (
-            <div key={`key${i}`}>
               <div
+              key={`key${i}`}
                 onClick={() => handleOnClick(ele.text)}
                 className="flex items-center justify-center px-2"
               >
                 <ele.Icon
-                  className={`text-2xl  ${
+                  className={`text-2xl ${
                     activeButton.toLowerCase() === ele.text.toLowerCase()
                       ? "text-[#2C62F0]"
                       : "text-[#002D4B]/60"
                   }`}
                 />
                 <p
-                  className={` text-[0.875rem] ml-2 leading-[1rem] ${
+                  className={`text-[0.875rem] ml-2 leading-[1rem] ${
                     activeButton.toLowerCase() === ele.text.toLowerCase()
                       ? "text-[#2C62F0] font-[500]"
                       : "text-[#002D4B]/60 font-normal"
@@ -499,12 +497,7 @@ function POS() {
                   {ele.text}
                 </p>
               </div>
-              <div >
-                {i !== headerButton.length - 1 && (
-                  <div className="h-6 mx-4 border-l border-r border-gray-400"></div>
-                )}
-              </div>
-            </div>
+            
           ))}
         </div>
       </div>
@@ -517,7 +510,7 @@ function POS() {
             return (
               <div key={kot?.id}>
                 {ele.dishStatus !== "" && (
-                  <div  className="mx-6 mb-6 bg-white rounded-2xl">
+                  <div className="mx-6 mb-6 bg-white rounded-2xl">
                     <div className="flex justify-between pt-4 mx-4">
                       <div className="flex flex-col">
                         <div className="font-[500] capitalize">
@@ -538,7 +531,7 @@ function POS() {
                     </div>
 
                     <div className="mx-4 mt-4 border-2 rounded-full border-gray-400/30"></div>
-                    {ele?.map((kot,i) => (
+                    {ele?.map((kot, i) => (
                       <div key={`${i}kot${kot.id}`}>
                         <div className="flex justify-between mx-4 mt-4">
                           <div className="w-[10%] font-[500]">
@@ -729,7 +722,10 @@ function POS() {
                   Category
                 </div>
                 <div className="absolute inset-0 pb-4 overflow-y-auto top-12">
-                  <ParentCategory closeModal={closeModal} parentCategory={parentCategories} />
+                  <ParentCategory
+                    closeModal={closeModal}
+                    parentCategory={parentCategories}
+                  />
                 </div>
               </div>
             </MenuPopup>
@@ -868,7 +864,9 @@ function POS() {
             <div className="bg-[#2C62F0] overflow-auto py-4 rounded-t-2xl">
               <div className="flex justify-between mx-4">
                 <div className="flex flex-col">
-                  <div className="font-[500] text-white capitalize">{billData[0]?.tableName}</div>
+                  <div className="font-[500] text-white capitalize">
+                    {billData[0]?.tableName}
+                  </div>
                   <div className="capitalize font-normal text-white text-[0.875rem] mt-1 leading-[1rem]">
                     {billData[0]?.customerName}
                   </div>
@@ -1075,7 +1073,7 @@ function POS() {
         <button
           onClick={() => {
             openModal("hey2");
-            getBill()
+            getBill();
             footerButton("continue");
           }}
           className="absolute text-sm font-[500] px-4 py-2 mr-2 border-white border text-[#2C62F0] bg-white rounded-full right-6 bottom-3"

@@ -7,7 +7,7 @@ import Image from "next/image";
 import { useLogin } from "@/components/store/useLogin";
 import axios from "axios";
 import { useRouter } from "next/router";
-import { PAGE_TYPES, routePaths } from "@/components/utils/routes";
+import { PAGE_TYPES, routePaths, singleRoute } from "@/components/utils/routes";
 
 function HiTable() {
   const {
@@ -74,7 +74,7 @@ console.log(businessId)
       if (!isEmpty(res)) {
         setUserDetails(res)
       }
-      router.push(`${routePaths[PAGE_TYPES.ZONE](`${businessId}`)}`)
+      router.push(`${singleRoute[PAGE_TYPES.ZONE](`${businessId}`)}`)
     } catch (err:any) {
       if (err?.response && err?.response?.status === 400) {
         // show alert message if status code is 400

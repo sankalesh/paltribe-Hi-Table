@@ -3,7 +3,7 @@ import Image from "next/image";
 import { MdMenuOpen } from "react-icons/md";
 import { HiArrowLeft } from "react-icons/hi";
 import { useRouter } from "next/router";
-import {PAGE_TYPES, routePaths } from "@/components/utils/routes";
+import { PAGE_TYPES, routePaths, singleRoute } from "@/components/utils/routes";
 
 interface HeaderProps {
   children: React.ReactNode;
@@ -12,7 +12,7 @@ interface HeaderProps {
 }
 
 function Header({ children, businessId, zoneId }: HeaderProps) {
-  console.log(businessId, zoneId)
+  console.log(businessId, zoneId);
 
   const router = useRouter();
 
@@ -21,12 +21,15 @@ function Header({ children, businessId, zoneId }: HeaderProps) {
   };
 
   const handleImageClick = () => {
-    router.push(routePaths[PAGE_TYPES.ZONE](businessId))
+    router.push(singleRoute[PAGE_TYPES.ZONE](businessId));
   };
   return (
     <div>
-      {children?.props.className === "mr-6" ? (
-        <div >
+      {children &&
+      React.isValidElement(children) &&
+      children.props &&
+      children.props.className === "mr-6" ? (
+        <div>
           <div className="flex justify-between ml-[1.5rem] pt-[2rem]">
             <HiArrowLeft
               onClick={handleImageClick}
@@ -37,7 +40,7 @@ function Header({ children, businessId, zoneId }: HeaderProps) {
           </div>
         </div>
       ) : (
-        <div >
+        <div>
           <div className="flex justify-between ml-[1.5rem] pt-[2rem]">
             <HiArrowLeft
               onClick={handleTableClick}
@@ -53,4 +56,3 @@ function Header({ children, businessId, zoneId }: HeaderProps) {
 }
 
 export default Header;
-

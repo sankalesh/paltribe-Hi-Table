@@ -1,8 +1,13 @@
-import { camelCase, lowerCase } from "lodash-es";
-import { memo, useEffect, useState } from "react";
+type FoodTypeClasses = {
+  [key: string]: {
+    border: string;
+    circle: string;
+    text: string;
+  };
+};
 
 export default function FoodType({ type }: { type: string }) {
-  const classes = {
+  const classes: FoodTypeClasses = {
     VEG: {
       border: "border-green-500",
       circle: "bg-green-500",

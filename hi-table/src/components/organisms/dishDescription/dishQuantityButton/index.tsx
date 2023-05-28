@@ -10,7 +10,7 @@ function DishQuantityButton({
   dishData,
   isDeleteAble,
 }: {
-  dishData: IDish;
+  dishData: any;
   isDeleteAble?: boolean;
 }) {
   const { openBottomPanel, closeBottomPanel } = useBottomPanel();
@@ -19,7 +19,7 @@ function DishQuantityButton({
   const setCart = useCart((s) => s.setCart);
 
   const handleQuantity = useCallback(
-    (quantity) =>
+    (quantity:any) =>
       handleDishQuantity(
         cart,
         dishData,
@@ -37,10 +37,11 @@ function DishQuantityButton({
     if (cart?.[dishData?.dishId]) {
       const newCart = {};
 
-      // remove dish object
+      // remove dish object 
+      
       Object.values(cart).forEach((dish) => {
-        if (dish.dishId !== dishData?.dishId) {
-          newCart[dish.dishId] = dish;
+        if (dish?.dishId !== dishData?.dishId) {
+          newCart[dish?.dishId] = dish;
         }
       });
 

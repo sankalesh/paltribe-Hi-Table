@@ -8,7 +8,6 @@ import MenuPopup from "@/components/molecules/menuPopup";
 import Image from "next/image";
 import Ima from "../../../../assets/svg/welcomeLogo.svg";
 import { RxCross2 } from "react-icons/rx";
-import Carousel from "@/components/atoms/carousal";
 import { MdOutlineCleaningServices } from "react-icons/md";
 import { BiBowlRice } from "react-icons/bi";
 import DishQuantityButton from "../../dishDescription/dishQuantityButton";
