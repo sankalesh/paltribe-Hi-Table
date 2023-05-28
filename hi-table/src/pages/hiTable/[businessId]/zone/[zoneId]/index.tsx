@@ -188,9 +188,9 @@ function Table() {
       `https://api.hipal.life/v1/kitchens?businessId=${businessId}`
     );
     const kitchenData = await kitchen.data;
-    const id = kitchenData.map((ele: any) => ele.id) as string;
+    const id = kitchenData?.[1]?.id
     console.log(id)
-    setKitchenId(id.toString());
+    setKitchenId(id);
   };
   const handleTableClick = (tableData:any) => {
     setTableData(tableData);

@@ -28,6 +28,8 @@ function Zones() {
   const { time, setTime } = useLogin();
   const [loggedIn, setLoggedIn] = useState(false);
   const router = useRouter();
+  const userDetail = useLogin(s=>s.userDetails);
+  console.log(userDetail.customRole?.[0]?.businessId);
   const { businessId, zoneId } = router.query as {
     businessId: string;
     zoneId: string;

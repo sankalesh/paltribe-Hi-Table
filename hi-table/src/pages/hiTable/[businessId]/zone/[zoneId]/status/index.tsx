@@ -232,9 +232,9 @@ function Status() {
         
 
           return (
-            <div>
+            <div key={`dishStatus${kot?.id}`}>
               {ele.dishStatus !== "" && (
-                <div key={`dishStatus${kot?.id}`} className="mx-6 mb-6 bg-white rounded-2xl">
+                <div  className="mx-6 mb-6 bg-white rounded-2xl">
                   <div className="flex justify-between pt-4 mx-4">
                     <div className="flex flex-col">
                       <div className="font-[500] capitalize">

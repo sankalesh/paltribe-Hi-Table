@@ -87,8 +87,6 @@ function POS() {
   const [statusData, setStatusData] = useState<IKot[]>([]);
 
   /****************************** pos ***************************************/
-  const [childCategory, setChildCategory] = useState<IChildCategory[]>([]);
-  const [parentCategory, setParentCategory] = useState<ICategory[]>([]);
   const [data, setData] = useState<any>([]);
 
   /******************************** settle part ***********************************/
@@ -207,6 +205,7 @@ function POS() {
 
   const sendCart = async () => {
     try {
+      console.log("cart api running 1 time");
       let config = {
         method: "post",
         url: "https://api.hipal.life/v1/kitchens/CreatePos/kots/Pos",
@@ -354,7 +353,6 @@ function POS() {
       `https://api.hipal.life/v1/kitchens/${kitchenId}/kots/bill?businessId=${businessId}&zoneId=${zoneId}&tableId=${tableId}&kitchenId=${kitchenId}&discount=${discount}`
     );
     const billData = response.data;
-    console.log(billData)
     if (!billData) return;
     setBillData(billData);
   }
@@ -479,9 +477,8 @@ function POS() {
 
         <div className="flex items-center justify-between p-4 mx-6 mt-6 bg-white rounded-full">
           {headerButton.map((ele, i) => (
-            <>
+            <div key={`key${i}`}>
               <div
-                key={i}
                 onClick={() => handleOnClick(ele.text)}
                 className="flex items-center justify-center px-2"
               >
@@ -502,12 +499,12 @@ function POS() {
                   {ele.text}
                 </p>
               </div>
-              <div>
+              <div >
                 {i !== headerButton.length - 1 && (
                   <div className="h-6 mx-4 border-l border-r border-gray-400"></div>
                 )}
               </div>
-            </>
+            </div>
           ))}
         </div>
       </div>
@@ -518,9 +515,9 @@ function POS() {
             const kot = ele[0];
 
             return (
-              <div>
+              <div key={kot?.id}>
                 {ele.dishStatus !== "" && (
-                  <div key={ele?.id} className="mx-6 mb-6 bg-white rounded-2xl">
+                  <div  className="mx-6 mb-6 bg-white rounded-2xl">
                     <div className="flex justify-between pt-4 mx-4">
                       <div className="flex flex-col">
                         <div className="font-[500] capitalize">
@@ -541,8 +538,8 @@ function POS() {
                     </div>
 
                     <div className="mx-4 mt-4 border-2 rounded-full border-gray-400/30"></div>
-                    {ele?.map((kot) => (
-                      <div>
+                    {ele?.map((kot,i) => (
+                      <div key={`${i}kot${kot.id}`}>
                         <div className="flex justify-between mx-4 mt-4">
                           <div className="w-[10%] font-[500]">
                             {kot?.dish?.qty} x
@@ -871,7 +868,7 @@ function POS() {
             <div className="bg-[#2C62F0] overflow-auto py-4 rounded-t-2xl">
               <div className="flex justify-between mx-4">
                 <div className="flex flex-col">
-                  <div className="font-[500] text-white capitalize">T-21</div>
+                  <div className="font-[500] text-white capitalize">{billData[0]?.tableName}</div>
                   <div className="capitalize font-normal text-white text-[0.875rem] mt-1 leading-[1rem]">
                     {billData[0]?.customerName}
                   </div>

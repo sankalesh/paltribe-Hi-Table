@@ -146,7 +146,7 @@ export interface ICategories extends ICategory {
 export interface ISettings {
   businessId: string;
   themes: {
-    [#2C62F0]Color: string;
+    bgColor: string;
     secondaryColor: string;
     accentColor: string;
     fontFamily: string;
