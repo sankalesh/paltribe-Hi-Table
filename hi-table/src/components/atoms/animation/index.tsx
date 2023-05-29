@@ -4,7 +4,7 @@ import Lottie from 'lottie-react'
 import Cooking from '../../../assets/animation/cooking.json'
 import { IOrder } from '@/components/types/hiTableData';
 
-const CookingAnimation = ({ onAnimationComplete ,data }: { onAnimationComplete: any,data:IOrder}) => {
+const CookingAnimation = ({ onAnimationComplete ,data }: { onAnimationComplete: any,data:any}) => {
 
   return (
     <div className="relative flex items-center justify-center w-full min-h-screen bg-white">

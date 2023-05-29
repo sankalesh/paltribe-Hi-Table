@@ -113,13 +113,18 @@ function ExtraWithDishWithSelect({ dishData }: { dishData: IDish }) {
                 const handleQuantityChange = (newQuantity: number) => {
                   const newCart = structuredClone(cartItem);
 
-                  const index =
-                    newCart?.[dishData?.id]?.variants?.length - 1 || 0;
+                  const index = newCart?.[dishData?.id]?.variants?.length - 1 || 0;
 
-                  newCart[dishData?.id].variants[index].extra[itemId] = {
-                    ...item,
-                    quantity: newQuantity,
-                  };
+                  if (newCart && newCart[dishData?.id] && newCart[dishData?.id].variants) {
+                    const variant = newCart[dishData?.id].variants[index];
+                    if (variant) {
+                      variant.extra = variant.extra || {};
+                      variant.extra[itemId] = {
+                        ...item,
+                        quantity: newQuantity,
+                      };
+                    }
+                  }
 
                   setCartItem(newCart);
                 };

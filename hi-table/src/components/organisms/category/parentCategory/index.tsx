@@ -9,7 +9,7 @@ export default function ParentCategory({
   parentCategory,
   closeModal,
 }: {
-  parentCategory: ICategory[];
+  parentCategory: any;
   closeModal: () => void;
 }) {
   

@@ -1,8 +1,3 @@
-export interface IDish {
-  name: string;
-  id: string;
-}
-
 export interface IStatus {
   businessId: string;
   kitchenId: string;
@@ -37,6 +32,11 @@ export interface IStatus {
   tableName: string;
   date: string;
   id: string;
+  _id: string;
+  subTotal: number;
+  Total: number;
+  CGST:number;
+  SGST:number;
 }
 
 export interface IOrder {
@@ -232,6 +232,7 @@ export interface IDish {
   id: string;
 }
 
+
 export interface ISpreadOption {}
 
 export interface ICategory {
@@ -239,18 +240,12 @@ export interface ICategory {
   name: string;
   visibility: boolean;
   timerOn: boolean;
-  timerStart: null;
-  timerEnd: null;
-  availableDays: never[];
+  
   hierarchy: string | "PARENT";
   parentCategory: string;
   parentCategoryId?: string;
   coverImage: string;
-  links: never[];
-  dishes: {
-    id: string;
-    name: string;
-  }[];
+ 
   version: number;
   id: string;
 }
@@ -277,6 +272,7 @@ export interface IPortion {
 
 
 export interface IKot {
+  map(arg0: (kot: any, i: any) => JSX.Element): import("react").ReactNode;
   businessId: string;
   kitchenId: string;
   zoneId: string;
@@ -310,4 +306,5 @@ export interface IKot {
   tableName: string;
   date: string;
   id: string;
+  _id: string;
 }

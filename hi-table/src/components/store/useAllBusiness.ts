@@ -4,7 +4,7 @@ import { useCallback, useMemo } from "react";
 import { isEqual } from "lodash";
 
 interface IUseAllBusiness {
-  data: IBusinessData;
+  data: any;
   setData: (data: object) => void;
 }
 

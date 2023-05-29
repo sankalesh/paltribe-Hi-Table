@@ -6,7 +6,7 @@ type FoodTypeClasses = {
   };
 };
 
-export default function FoodType({ type }: { type: string }) {
+export default function FoodType({ type }: { type: any }) {
   const classes: FoodTypeClasses = {
     VEG: {
       border: "border-green-500",

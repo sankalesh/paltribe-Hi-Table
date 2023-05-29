@@ -18,7 +18,7 @@ export interface ICartVariant {
 export interface ICartDish {
   dishData?: IDish;
   dishId?: string;
-  variants: ICartVariant[];
+  variants: any;
 }
 
 export interface ICart {

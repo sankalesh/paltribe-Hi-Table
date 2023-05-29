@@ -1,4 +1,3 @@
-import Dropdown from "@/components/atoms/dropDown";
 import Menu from "@/components/organisms/category/childCategory";
 import Header from "@/components/molecules/header";
 import MenuPopup from "@/components/molecules/menuPopup";
@@ -79,19 +78,20 @@ function POS() {
     tableId: string;
   };
   const kitchenId = useLogin((s) => s.kitchenId);
+  console.log(cart);
 
   /*************************Settle part for individual**************************************/
   const [selectedDishStatus, setSelectedDishStatus] = useState<IKot | null>(
     null
   );
-  const [statusData, setStatusData] = useState<IKot[]>([]);
+  const [statusData, setStatusData] = useState<any[]>([]);
 
   /****************************** pos ***************************************/
   const [data, setData] = useState<any>([]);
 
   /******************************** settle part ***********************************/
   const [billData, setBillData] = useState<IStatus[]>([]);
-  const [selectedDishes, setSelectedDishes] = useState([]);
+  const [selectedDishes, setSelectedDishes] = useState<string[]>([]);
   const [discountValue, setDiscountValue] = useState(0);
   const [discountMode, setDiscountMode] = useState("rupees");
   const [discount, setDiscount] = useState(0);
@@ -139,9 +139,9 @@ function POS() {
   });
 
   const getDishPrice = (
-    dishData: IDish,
-    selectedPortion: IPortion,
-    selectedExtras: IExtraItem
+    dishData: any,
+    selectedPortion: any,
+    selectedExtras: any
   ) => {
     let price = 0;
     if (selectedPortion === undefined) {
@@ -155,9 +155,8 @@ function POS() {
       price += parseFloat(portion.price);
     }
     // Add extra prices
-    console.log(selectedExtras);
-    selectedExtras.map((extra, i) => {
-      price += parseFloat(extra?.price * extra?.quantity);
+    selectedExtras.map((extra: any, i: any) => {
+      price += extra?.price * extra?.quantity;
     });
 
     return price.toFixed(2);
@@ -191,10 +190,10 @@ function POS() {
     });
 
     // Remove null values (items without variants) from the updatedCartArray
-    const updatedCart = updatedCartArray.filter((item) => item !== null);
+    const updatedCart = updatedCartArray.filter((item: any) => item !== null);
     console.log(updatedCart);
     setCart(
-      updatedCart.reduce((acc, item) => {
+      updatedCart.reduce((acc, item: any) => {
         return {
           ...acc,
           [item?.dishData.id]: item,
@@ -259,7 +258,7 @@ function POS() {
     setDiscountMode(e.target.value);
   };
 
-  const handleDishSelection = (dishId) => {
+  const handleDishSelection = (dishId: string) => {
     const isDishSelected = selectedDishes.includes(dishId);
     let updatedSelectedDishes;
 
@@ -407,7 +406,7 @@ function POS() {
     setActiveButton(str);
   };
 
-  const openModal = (kot: IKot) => {
+  const openModal = (kot: any) => {
     setIsModalOpen(true);
     setSelectedDishStatus(kot);
   };
@@ -475,29 +474,28 @@ function POS() {
 
         <div className="flex items-center justify-between p-4 mx-6 mt-6 bg-white rounded-full">
           {headerButton.map((ele, i) => (
-              <div
+            <div
               key={`key${i}`}
-                onClick={() => handleOnClick(ele.text)}
-                className="flex items-center justify-center px-2"
+              onClick={() => handleOnClick(ele.text)}
+              className="flex items-center justify-center px-2"
+            >
+              <ele.Icon
+                className={`text-2xl ${
+                  activeButton.toLowerCase() === ele.text.toLowerCase()
+                    ? "text-[#2C62F0]"
+                    : "text-[#002D4B]/60"
+                }`}
+              />
+              <p
+                className={`text-[0.875rem] ml-2 leading-[1rem] ${
+                  activeButton.toLowerCase() === ele.text.toLowerCase()
+                    ? "text-[#2C62F0] font-[500]"
+                    : "text-[#002D4B]/60 font-normal"
+                }`}
               >
-                <ele.Icon
-                  className={`text-2xl ${
-                    activeButton.toLowerCase() === ele.text.toLowerCase()
-                      ? "text-[#2C62F0]"
-                      : "text-[#002D4B]/60"
-                  }`}
-                />
-                <p
-                  className={`text-[0.875rem] ml-2 leading-[1rem] ${
-                    activeButton.toLowerCase() === ele.text.toLowerCase()
-                      ? "text-[#2C62F0] font-[500]"
-                      : "text-[#002D4B]/60 font-normal"
-                  }`}
-                >
-                  {ele.text}
-                </p>
-              </div>
-            
+                {ele.text}
+              </p>
+            </div>
           ))}
         </div>
       </div>
@@ -531,7 +529,7 @@ function POS() {
                     </div>
 
                     <div className="mx-4 mt-4 border-2 rounded-full border-gray-400/30"></div>
-                    {ele?.map((kot, i) => (
+                    {ele?.map((kot: any, i) => (
                       <div key={`${i}kot${kot.id}`}>
                         <div className="flex justify-between mx-4 mt-4">
                           <div className="w-[10%] font-[500]">
@@ -749,7 +747,7 @@ function POS() {
                       const selectedPortion = portion?.name;
                       const selectedExtra = extra
                         ? Object.values(extra)?.filter(
-                            (item) => item.quantity > 0
+                            (item: any) => item?.quantity > 0
                           )
                         : [];
                       return (
@@ -760,16 +758,16 @@ function POS() {
                             </div>
                             <div className="w-[70%] -ml-12">
                               <div className="text-[#002D4B] font-[500] text-[1rem] leading-[1.25rem]">
-                                {name?.length < 35
+                                {name?.length && name.length < 35
                                   ? name
-                                  : name.slice(0, 35) + "..."}
+                                  : name?.slice(0, 35) + "..."}
                               </div>
                               {selectedPortion?.length > 0 && (
                                 <div className=" text-[#002D4B]/50 font-[500] mt-1 text-[1rem] leading-[1.25rem]">
                                   <div>{selectedPortion}</div>
                                   <div>
                                     {selectedExtra.map(
-                                      (extraItem, extraIndex) => (
+                                      (extraItem: any, extraIndex) => (
                                         <div
                                           key={`${dishData?.id}-${index}-${variantIndex}-${extraIndex}`}
                                         >
@@ -793,7 +791,7 @@ function POS() {
 
                                 <div
                                   onClick={() =>
-                                    handleDeleteItem(id, cartItem?.dishData?.id)
+                                    handleDeleteItem(id)
                                   }
                                   className="text-[#2C62F0] rounded-2xl px-6 py-2 bg-white mt-1 -mr-[6rem] font-[500] text-[1rem] leading-[1.25rem]"
                                 >

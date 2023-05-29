@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import HiTableLogo from "../assets/svg/HiTableLogo.svg";
 import welcome from "../assets/svg/welcomeLogo.svg";
-import { isEmpty } from 'lodash-es'
+import { isEmpty } from "lodash-es";
 
 import Image from "next/image";
 import { useLogin } from "@/components/store/useLogin";
@@ -18,8 +18,6 @@ function HiTable() {
     setBusinessName,
     setPassword,
   } = useLogin();
-
-
 
   const handlePhoneNumberChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -43,41 +41,36 @@ function HiTable() {
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-  result()
-    console.log(phoneNumber, name, password, businessName)
+    result();
+    console.log(phoneNumber, name, password, businessName);
   };
 
-  const setUserDetails = useLogin(s => s.setUserDetails)
+  const setUserDetails = useLogin((s) => s.setUserDetails);
 
   const result = async () => {
     try {
       const config = {
-        method: 'POST',
-        url: 'https://api.hipal.life/v1/users/waiterLogin',
+        method: "POST",
+        url: "https://api.hipal.life/v1/users/waiterLogin",
         data: {
           phone: phoneNumber,
-          password: password
-        }
-      }
-  
-      const user = await axios(config)
-      const res = user.data
-  
+          password: password,
+        },
+      };
+
+      const user = await axios(config);
+      const res = user.data;
+
       if (!isEmpty(res)) {
-        setUserDetails(res)
+        setUserDetails(res);
       } else {
         // show alert message if response is empty
-        alert("Phone or Password invalid...!")
+        alert("Phone or Password invalid...!");
       }
-    } catch (err) {
-      if (err.response && err.response.status === 400) {
-        // show alert message if status code is 400
-        alert("Phone or Password invalid...!")
-      } else {
-        console.log(err)
-      }
+    } catch (err: any) {
+      console.log(err);
     }
-  }
+  };
   return (
     <div>
       <div className="flex justify-center mt-[2rem]">

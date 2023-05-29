@@ -97,7 +97,7 @@ function Status() {
     setActiveButton(str);
     if (str.length > 0) {
       setStatusData(
-        statusData?.map((ele, i) => {
+        statusData?.map((ele:any, i) => {
           const kot = ele?.[0];
           return ele?.filter(
             (k) => k?.dishStatus?.toLowerCase() === str?.toLowerCase()
@@ -130,8 +130,10 @@ function Status() {
   }, []);
   const filteredStatusData = useMemo(() => {
     if (activeButton.length > 0) {
-      return statusData.map((ele) =>
-        ele?.filter((k) => k?.dishStatus?.toLowerCase() === activeButton?.toLowerCase())
+      return statusData.map((ele: any) =>
+        Array.isArray(ele)
+          ? ele.filter((k: any) => k?.dishStatus?.toLowerCase() === activeButton?.toLowerCase())
+          : ele
       );
     } else {
       return statusData;
