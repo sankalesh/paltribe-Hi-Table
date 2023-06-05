@@ -12,7 +12,6 @@ interface HeaderProps {
 }
 
 function Header({ children, businessId, zoneId }: HeaderProps) {
-  console.log(businessId, zoneId);
 
   const router = useRouter();
 

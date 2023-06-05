@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import HiTableLogo from "../../../../assets/svg/HiTableLogo.svg";
 import welcome from "../../../../assets/svg/welcomeLogo.svg";
-import { isEmpty } from 'lodash-es'
+import { isEmpty } from "lodash-es";
 
 import Image from "next/image";
 import { useLogin } from "@/components/store/useLogin";
 import axios from "axios";
 import { useRouter } from "next/router";
 import { PAGE_TYPES, routePaths, singleRoute } from "@/components/utils/routes";
+import { toast } from "react-toastify";
 
 function HiTable() {
   const {
@@ -22,12 +23,10 @@ function HiTable() {
     userDetails,
   } = useLogin();
 
-  const userDetail = useLogin(s=>s.userDetails);
-  console.log(userDetail.customRole?.[0]?.businessId);
+  const userDetail = useLogin((s) => s.userDetails);
 
-const router = useRouter();
-const businessId = userDetail.customRole?.[0]?.businessId;
-console.log(businessId)
+  const router = useRouter();
+  const {businessId} = router.query as {businessId: string};
 
   const handlePhoneNumberChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -51,39 +50,42 @@ console.log(businessId)
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-  result()
-    console.log(phoneNumber, name, password, businessName)
+    result();
+    console.log(phoneNumber, name, password, businessName);
   };
 
-  const setUserDetails = useLogin(s => s.setUserDetails)
+  const setUserDetails = useLogin((s) => s.setUserDetails);
 
   const result = async () => {
     try {
       const config = {
-        method: 'POST',
-        url: 'https://api.hipal.life/v1/users/waiterLogin',
+        method: "POST",
+        url: "https://api.hipal.life/v1/users/waiterLogin",
+        
+      
+        
         data: {
           phone: phoneNumber,
-          password: password
-        }
-      }
-  
-      const user = await axios(config)
-      const res = user.data
-  
+          password: password,
+        },
+      };
+
+      const user = await axios(config);
+      const res = user.data;
+
       if (!isEmpty(res)) {
-        setUserDetails(res)
+        setUserDetails(res);
       }
-      router.push(`${singleRoute[PAGE_TYPES.ZONE](`${businessId}`)}`)
-    } catch (err:any) {
+      router.push(`${singleRoute[PAGE_TYPES.ZONE](`${businessId}`)}`);
+    } catch (err: any) {
       if (err?.response && err?.response?.status === 400) {
         // show alert message if status code is 400
-        alert("Phone or Password invalid...!")
+        toast.error("Phone or Password invalid...!");
       } else {
-        console.log(err)
+        console.log(err);
       }
     }
-  }
+  };
   return (
     <div>
       <div className="flex justify-center mt-[2rem]">

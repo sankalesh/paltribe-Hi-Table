@@ -16,6 +16,9 @@ import HiPalLogo from "../../../../../../assets/svg/hipalLogoNew.svg";
 import { useRouter } from "next/router";
 import axios from "axios";
 import { useLogin } from "@/components/store/useLogin";
+import { Howl, Howler } from "howler";
+import { useAlert } from "@/components/store/useAlert";
+import { set } from "lodash";
 
 const filterButtons = [
   {
@@ -48,8 +51,14 @@ interface IAlertData {
 }
 
 function Alert() {
-  const [data, setData] = useState<IAlertData[]>([]);
-  const [historyData, setHistoryData] = useState<IAlertData[]>([]);
+  const {
+    data,
+    historyData,
+    setData,
+    setHistoryData,
+    newAlertsCount,
+    setNewAlertsCount,
+  } = useAlert();
   const [search, setSearch] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [previousLength, setPreviousLength] = useState(0);
@@ -57,12 +66,12 @@ function Alert() {
   const [activeButton, setActiveButton] = useState("");
   const router = useRouter();
   const userDetail = useLogin((s) => s.userDetails);
+  // console.log("this alert page data",data)
 
   const { businessId, zoneId } = router.query as {
     businessId: string;
     zoneId: string;
   };
-  console.log(businessId, zoneId, userDetail.id);
 
   const handleOnclick = (str: string) => {
     str = activeButton.length === 0 ? str : "";
@@ -89,22 +98,10 @@ function Alert() {
   const historyOnClick = () => {
     setShowHistory(!showHistory);
   };
-  // const historyOnClick = () => {
-  //   async function alertData() {
-  //     const response = await axios.get(
-  //       `https://api.hipal.life/v1/kitchens/get/AllAlertByWaiter?waiterId=5&businessId=${businessId}&isAlertOn=true`
-  //     );
-  //     const data = await response.data;
-  //     console.log(data);
-  //     setData(data);
-  //   }
-  //   alertData();
-  //   setShowHistory(!showHistory);
-  // };
   useEffect(() => {
     onAlertData();
     offAlertData();
-  },[])
+  }, []);
 
   const popOver = (search = "") => {
     if (search.length > 0) {
@@ -133,7 +130,17 @@ function Alert() {
       `https://api.hipal.life/v1/kitchens/get/AllAlertByWaiter?staffId=${userDetail?.id}&businessId=${businessId}&isAlertOn=true&zoneId=${zoneId}`
     );
     const data = await response.data;
-    console.log(data)
+    if (data.length > newAlertsCount) {
+      setNewAlertsCount(data.length);
+
+      const sound = new Howl({
+        src: ["/sounds/hotel_bell.mp3"],
+        autoplay: true,
+      });
+
+      sound.play();
+    }
+    // setNewAlertsCount(data.length);
     setData(data);
   }
 
@@ -141,22 +148,21 @@ function Alert() {
     const response = await axios.get(
       `https://api.hipal.life/v1/kitchens/get/AllAlertByWaiter?staffId=${userDetail?.id}&businessId=${businessId}&isAlertOn=false&zoneId=${zoneId}`
     );
-    const data = await response.data;
-    console.log(data)
-    setHistoryData(data);
+    const historyData = await response.data;
+    setHistoryData(historyData);
   }
 
   return (
     <div className={` bg-[#f5f5f5] min-h-screen pb-20 relative`}>
-     <Header businessId={businessId} zoneId={zoneId}>
-  <Image
-    className="mr-6"
-    width={68}
-    height={25}
-    src={HiPalLogo}
-    alt="Hi Table Logo"
-  />
-</Header>
+      <Header businessId={businessId} zoneId={zoneId}>
+        <Image
+          className="mr-6"
+          width={68}
+          height={25}
+          src={HiPalLogo}
+          alt="Hi Table Logo"
+        />
+      </Header>
       <div className="sticky top-0 z-50 bg-[#f5f5f5]">
         <div className="flex justify-between pb-6">
           <div
@@ -295,7 +301,7 @@ function Alert() {
               className="mx-6 relative bg-gray-200 h-[4.75rem] rounded-xl"
             >
               <div className="font-bold capitalize text-[#002D4B] text-[1rem] leading-[1.25rem] absolute left-4 top-4">
-                {ele?.tableName ? "" : "T001"}
+                {ele?.tableName ? "" : "T-001"}
               </div>
               <div className="font-normal text-[#002D4B]/40 text-[0.875rem] leading-[1rem] absolute right-4 top-4">
                 {ele?.time}

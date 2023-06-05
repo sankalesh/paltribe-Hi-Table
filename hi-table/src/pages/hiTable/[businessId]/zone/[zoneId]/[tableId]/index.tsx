@@ -78,7 +78,6 @@ function POS() {
     tableId: string;
   };
   const kitchenId = useLogin((s) => s.kitchenId);
-  console.log(cart);
 
   /*************************Settle part for individual**************************************/
   const [selectedDishStatus, setSelectedDishStatus] = useState<IKot | null>(
@@ -99,7 +98,6 @@ function POS() {
   /********************* All functions are related to status *********************/
 
   const handleDishStatus = async (kotId: any) => {
-    console.log(kotId);
     let config = {
       method: "put",
       url: "https://api.hipal.life/v1/kitchens/update/kots/dish",
@@ -163,7 +161,6 @@ function POS() {
   };
 
   const handleDeleteItem = (variantId: string) => {
-    console.log(variantId);
     let cartArray = Object.values(cart);
     const updatedCartArray = cartArray.map((item) => {
       // Check if the item has variants
@@ -191,7 +188,6 @@ function POS() {
 
     // Remove null values (items without variants) from the updatedCartArray
     const updatedCart = updatedCartArray.filter((item: any) => item !== null);
-    console.log(updatedCart);
     setCart(
       updatedCart.reduce((acc, item: any) => {
         return {
@@ -204,7 +200,6 @@ function POS() {
 
   const sendCart = async () => {
     try {
-      console.log("cart api running 1 time");
       let config = {
         method: "post",
         url: "https://api.hipal.life/v1/kitchens/CreatePos/kots/Pos",
@@ -283,7 +278,6 @@ function POS() {
                 discountValue,
                 bill?.dish?.price
               );
-              console.log("calling get billl 1");
 
               setDiscount(maxdiscountValue * selectedDishes.length);
               getBill();
@@ -320,7 +314,6 @@ function POS() {
                 const maxdiscountValue = Math.min(discountValue, 100);
                 const discount = (bill?.dish?.price * maxdiscountValue) / 100;
                 totalDiscount += discount;
-                console.log("calling get bill 3");
                 setDiscount(totalDiscount);
                 getBill();
                 dishTotal -= discount;
@@ -339,7 +332,6 @@ function POS() {
             setDiscount(discount);
             subTotal -= discount;
           }
-          console.log("hey");
         }
       }
     }
@@ -374,7 +366,6 @@ function POS() {
 
   /************************* functions for small changes *****************************/
   const footerButton = (str: string) => {
-    console.log(str);
     setFootButton(str);
   };
 
@@ -396,7 +387,6 @@ function POS() {
   const handleOnClick = (str: string) => {
     // str = activeButton.length === 0 ? str : "";
     if (str.toLowerCase() === "pos") {
-      console.log(str);
       getAllChildCategories();
     } else if (str.toLowerCase() === "status") {
       getAllKotSpecificTable();
@@ -624,7 +614,7 @@ function POS() {
                                   </button>
                                 </div>
                               )}
-                              <div className="fixed bottom-0 z-20 w-full py-2 mx-6 shadow-lg shadow-base-100">
+                              <div className={`${selectedDishStatus?.dishStatus === "delivered" ? "hidden" : "fixed bottom-0 z-20 w-full py-2 mx-6 shadow-lg shadow-base-100"}`}>
                                 <button
                                   onClick={() =>
                                     handleDishStatus(selectedDishStatus?._id)
@@ -1084,75 +1074,3 @@ function POS() {
 }
 
 export default POS;
-
-// const generateBill = () => {
-//   if (selectedDishes.length !== 0) {
-//     const total = billData
-//       .slice(0, billData.length - 2)
-//       .reduce((accumulator, bill) => {
-//         let dishTotal = bill?.dish?.price * bill?.dish?.qty;
-//         if (selectedDishes.includes(bill?.dish?.dishId)) {
-//           if (discountValue > 0) {
-//             const maxdiscountValue = Math.min(
-//               discountValue,
-//               bill?.dish?.price
-//             );
-//             dishTotal -= maxdiscountValue;
-//           } else if (discountValue > 0) {
-//             const maxdiscountValue = Math.min(discountValue, 100);
-//             const discount =
-//               (bill?.dish?.price * maxdiscountValue) / 100;
-//             dishTotal -= discount;
-//           }
-//         }
-
-//         return accumulator + dishTotal;
-//       }, 0);
-
-//     console.log("hey:", total);
-//   } else {
-//     const subtotal = billData
-//       .slice(0, billData.length - 2)
-//       .reduce((accumulator, bill) => {
-//         let dishTotal = bill?.dish?.price * bill?.dish?.qty;
-//         return accumulator + dishTotal;
-//       }, 0);
-
-//     let total = subtotal;
-
-//     if (selectedDishes.length === 0) {
-//       if (discountValue > 0) {
-//         total -= discountValue;
-//       } else if (discountValue > 0) {
-//         const discount = (subtotal * discountValue) / 100;
-//         total -= discount;
-//       }
-//     }
-
-//     console.log("Total:", total);
-//     // Rest of the bill generation logic
-//   }
-// };
-
-// const generateBill = () => {
-//   const total = billData
-//     .slice(0, billData.length - 2)
-//     .reduce((accumulator, bill) => {
-//       let dishTotal = bill.dish.price * bill.dish.qty;
-
-//       if (selectedDish.dishId === bill.dish.dishId) {
-//         console.log("if before", dishTotal);
-//         const discount = (bill.dish.price * selectedDish.discount) / 100;
-//         dishTotal -= discount;
-//         console.log("if statement", dishTotal);
-//       }
-//       console.log("watching the values", accumulator, dishTotal);
-
-//       return accumulator + dishTotal;
-//     }, 0);
-//   console.log("Total:", total);
-//   // Rest of the bill generation logic
-// };
-
-// useEffect(() => {
-// }, [selectedDishes, discountValue, discountValue]);

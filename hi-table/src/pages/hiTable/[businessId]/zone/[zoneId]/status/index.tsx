@@ -1,6 +1,6 @@
 import HeaderButton from "@/components/atoms/buttons/headerButton";
 import Header from "@/components/molecules/header";
-import React, { useEffect, useState,useMemo  } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { MdAlarm } from "react-icons/md";
 import { TbToolsKitchen2 } from "react-icons/tb";
 import { SiGoogleassistant } from "react-icons/si";
@@ -68,7 +68,6 @@ function Status() {
   };
 
   const openModal = (kot: IKot) => {
-    console.log(kot);
     setIsModalOpen(true);
     setSelectedDishStatus(kot);
   };
@@ -97,7 +96,7 @@ function Status() {
     setActiveButton(str);
     if (str.length > 0) {
       setStatusData(
-        statusData?.map((ele:any, i) => {
+        statusData?.map((ele: any, i) => {
           const kot = ele?.[0];
           return ele?.filter(
             (k) => k?.dishStatus?.toLowerCase() === str?.toLowerCase()
@@ -109,20 +108,17 @@ function Status() {
     getAllStatusData();
   };
 
- 
-
-  const handleDishStatus = async(kotId:any) => {
-    console.log(kotId);
+  const handleDishStatus = async (kotId: any) => {
     let config = {
-      method:'put',
-      url:'https://api.hipal.life/v1/kitchens/update/kots/dish',
-      data:{
-        kots:[kotId]
-      }
-    }
+      method: "put",
+      url: "https://api.hipal.life/v1/kitchens/update/kots/dish",
+      data: {
+        kots: [kotId],
+      },
+    };
     const res = await axios(config);
-    getAllStatusData()
-    closeModal()
+    getAllStatusData();
+    closeModal();
   };
 
   useEffect(() => {
@@ -131,9 +127,10 @@ function Status() {
   const filteredStatusData = useMemo(() => {
     if (activeButton.length > 0) {
       return statusData.map((ele: any) =>
-        Array.isArray(ele)
-          ? ele.filter((k: any) => k?.dishStatus?.toLowerCase() === activeButton?.toLowerCase())
-          : ele
+        ele?.filter(
+          (k: any) =>
+            k?.dishStatus?.toLowerCase() === activeButton?.toLowerCase()
+        )
       );
     } else {
       return statusData;
@@ -145,21 +142,20 @@ function Status() {
       `https://api.hipal.life/v1/kitchens/${kitchenId}/getAllKotByWaiter/all?businessId=${businessId}&kitchenId=${kitchenId}&zoneId=${zoneId}&staffId=${userDetails?.id}`
     );
     const data = response.data;
-    console.log(data)
     setStatusData(data);
   }
 
   return (
     <div className="bg-[#f5f5f5] min-h-screen pb-6 relative">
       <Header businessId={businessId} zoneId={zoneId}>
-  <Image
-    className="mr-6"
-    width={68}
-    height={25}
-    src={HiPalLogo}
-    alt="Hi Table Logo"
-  />
-</Header>
+        <Image
+          className="mr-6"
+          width={68}
+          height={25}
+          src={HiPalLogo}
+          alt="Hi Table Logo"
+        />
+      </Header>
       <div className="sticky top-0 z-50 bg-[#f5f5f5]">
         <div className="flex justify-between">
           <div
@@ -227,16 +223,17 @@ function Status() {
         {filteredStatusData.map((ele, i) => {
           // Get the first element from the current sub-array
           const kot = ele[0];
-          console.log("thisn  aidbcnca ",kot)
           if (!kot) {
             return null; // or any placeholder component or message
           }
-        
 
           return (
-            <div key={`dishStatus${kot?.id}`}>
+            <div>
               {ele.dishStatus !== "" && (
-                <div  className="mx-6 mb-6 bg-white rounded-2xl">
+                <div
+                  key={`dishStatus${kot?.id}`}
+                  className="mx-6 mb-6 bg-white rounded-2xl"
+                >
                   <div className="flex justify-between pt-4 mx-4">
                     <div className="flex flex-col">
                       <div className="font-[500] capitalize">
@@ -257,7 +254,7 @@ function Status() {
                   </div>
 
                   <div className="mx-4 mt-4 border-2 rounded-full border-gray-400/30"></div>
-                  {ele?.map((kot,i) => (
+                  {ele?.map((kot, i) => (
                     <div key={`${kot?.id}kot${i}`}>
                       <div className="flex justify-between mx-4 mt-4">
                         <div className="w-[10%] font-[500]">
@@ -353,9 +350,11 @@ function Status() {
                                 </button>
                               </div>
                             )}
-                            <div className="fixed bottom-0 z-20 w-full py-2 mx-6 shadow-lg shadow-base-100">
+                            <div  className={`${selectedDishStatus?.dishStatus === "delivered" ? "hidden" : "fixed bottom-0 z-20 w-full py-2 mx-6 shadow-lg shadow-base-100"}`}>
                               <button
-                                onClick={() => handleDishStatus(selectedDishStatus?.id)}
+                                onClick={() =>
+                                  handleDishStatus(selectedDishStatus?.id)
+                                }
                                 className="py-4 w-[85%] space-x-2 text-white bg-[#2C62F0] rounded-full"
                               >
                                 Mark as delivered

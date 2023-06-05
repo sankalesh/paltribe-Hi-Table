@@ -84,7 +84,7 @@ function Orders() {
           >
             <div className="flex justify-between pt-4 mx-4">
               <div className="flex flex-col">
-                <div className="font-[500] capitalize">T-21</div>
+                <div className="font-[500] capitalize">{ele.tableName}</div>
                 <div className="capitalize font-normal text-[#002D4B]/40 text-[0.875rem] mt-1 leading-[1rem]">
                   {ele.customerName}
                 </div>

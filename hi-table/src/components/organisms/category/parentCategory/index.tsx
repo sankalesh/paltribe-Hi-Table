@@ -13,7 +13,6 @@ export default function ParentCategory({
   closeModal: () => void;
 }) {
   
-  console.log(parentCategory);
 
   return (
     <div className="relative w-full px-4">

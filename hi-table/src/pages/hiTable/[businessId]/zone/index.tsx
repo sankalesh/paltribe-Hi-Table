@@ -29,12 +29,10 @@ function Zones() {
   const [loggedIn, setLoggedIn] = useState(false);
   const router = useRouter();
   const userDetail = useLogin(s=>s.userDetails);
-  console.log(userDetail.customRole?.[0]?.businessId);
   const { businessId, zoneId } = router.query as {
     businessId: string;
     zoneId: string;
   };
-console.log(time)
   useEffect(() => {
     let intervalId: NodeJS.Timeout;
 
@@ -44,6 +42,8 @@ console.log(time)
         setTime(currTime);
       }, 10000); 
     }
+
+    /////////////////////////remo
 
     return () => {
       clearInterval(intervalId); // Cleanup the interval when component unmounts or toggle is turned off
@@ -65,7 +65,7 @@ console.log(time)
       console.log(businessId);
       result();
     }
-  }, [businessId]);
+  }, []);
 
   const result = async () => {
     try {

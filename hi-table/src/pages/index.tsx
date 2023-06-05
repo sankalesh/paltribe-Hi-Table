@@ -6,6 +6,9 @@ import { isEmpty } from "lodash-es";
 import Image from "next/image";
 import { useLogin } from "@/components/store/useLogin";
 import axios from "axios";
+import { useRouter } from "next/router";
+import { PAGE_TYPES, routePaths, singleRoute } from "@/components/utils/routes";
+import { toast } from "react-toastify";
 
 function HiTable() {
   const {
@@ -17,8 +20,13 @@ function HiTable() {
     setName,
     setBusinessName,
     setPassword,
+    userDetails,
   } = useLogin();
 
+  const userDetail = useLogin((s) => s.userDetails);
+
+  const router = useRouter();
+  const businessId = userDetail.customRole?.[0]?.businessId;
   const handlePhoneNumberChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -60,15 +68,16 @@ function HiTable() {
 
       const user = await axios(config);
       const res = user.data;
-
       if (!isEmpty(res)) {
         setUserDetails(res);
-      } else {
-        // show alert message if response is empty
-        alert("Phone or Password invalid...!");
       }
+      if (res.status === "success") {
+        toast.success("Login Successfully...!");
+        router.push(`${singleRoute[PAGE_TYPES.ZONE](`${businessId}`)}`);
+      }
+      toast.error("Phone or Password invalid...!");
     } catch (err: any) {
-      console.log(err);
+      toast.error("Phone or Password invalid...!");
     }
   };
   return (

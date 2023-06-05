@@ -117,7 +117,6 @@ function Table() {
   const setKitchenId = useLogin((s) => s.setKitchenId);
   const setTableData = useTable((s) => s.setTableData);
   const tableData = useTable((s) => s.tableData);
-  console.log(tableData);
 
   const router = useRouter();
 
@@ -157,21 +156,6 @@ function Table() {
     result();
   };
 
-  // const handleClickOutside = (event:any) => {
-  //   if (!searchRef?.current?.contains(event.target)) {
-  //     console.log("this is search ref", !searchRef?.current?.contains(event.target));
-  //     // setSearchOpen(false);
-  //     // setSearch("");
-  //     document?.activeElement?.blur(); // hides the keyboard on mobile devices
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   window.addEventListener("scroll", handleClickOutside);
-  //   return () => {
-  //     window.removeEventListener("scroll", handleClickOutside);
-  //   };
-  // }, []);
   useEffect(() => {
     result();
   }, []);
@@ -188,7 +172,7 @@ function Table() {
       `https://api.hipal.life/v1/kitchens?businessId=${businessId}`
     );
     const kitchenData = await kitchen.data;
-    const id = kitchenData?.[1]?.id
+    const id = kitchenData?.[0]?.id
     console.log(id)
     setKitchenId(id);
   };
