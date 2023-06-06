@@ -84,15 +84,15 @@ function Orders() {
               <div className="flex flex-col">
                 <div className="font-[500] capitalize">{ele.tableName}</div>
                 <div className="capitalize font-normal text-[#002D4B]/40 text-[0.875rem] mt-1 leading-[1rem]">
-                  {ele.customerName}
+                  {ele?.items?.[0].customerName}
                 </div>
               </div>
               <div className="flex flex-col">
                 <div className="text-right text-md font-[500] text-[#2C62F0]">
-                  {ele.time}
+                  {ele?.time}
                 </div>
                 <div className="capitalize font-normal mt-1 text-[#002D4B]/40 text-[0.875rem] leading-[1rem]">
-                  {ele.date}
+                  {ele?.date}
                 </div>
               </div>
             </div>
@@ -100,7 +100,7 @@ function Orders() {
             <div className="relative pt-2 pb-[4.875rem]">
               {ele.items.map((item, i) => (
                 <div
-                  key={item.dish.dishId + "dish" + i}
+                  key={item?.dish?.dishId + "dish" + i}
                   className="flex mx-4 mt-4"
                 >
                   <div className="w-[10%] font-[500]">{item?.dish?.qty} x</div>
@@ -121,7 +121,7 @@ function Orders() {
                   Reject
                 </button>
                 <button
-                  onClick={() => acceptOrder(ele.id)}
+                  onClick={() => acceptOrder(ele?.id)}
                   className="active_on_bounce border border-[#2C62F0]  text-md font-[500] text-[#2C62F0] py-1 px-6 rounded-2xl"
                 >
                   Accept
