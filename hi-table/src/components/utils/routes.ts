@@ -11,6 +11,7 @@ export const PAGE_TYPES = {
   STATUS: "status",
   ORDER: "orders",
   SINGLE_TABLE: "single",
+  KICK_USER:'kickUser'
 };
 
 export const routePaths = {
@@ -37,4 +38,9 @@ export const newRoutes = {
     zoneId: string,
     tableId: string
   ) => withBusinessId(businessId, `/zone/${zoneId}/${tableId}`),
+  [PAGE_TYPES.KICK_USER]: (
+    businessId: string,
+    zoneId: string,
+    tableId: string
+  ) => withBusinessId(businessId, `/zone/${zoneId}/${tableId}/kickUser`),
 }

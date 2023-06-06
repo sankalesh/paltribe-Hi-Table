@@ -38,6 +38,7 @@ import { isEmpty } from "lodash";
 import { useLogin } from "@/components/store/useLogin";
 import { useTable } from "@/components/store/useTable";
 import { PAGE_TYPES, routePaths } from "@/components/utils/routes";
+import TableHeader from "@/components/molecules/tableHeader";
 
 const headerButton = [
   {
@@ -90,6 +91,7 @@ function POS() {
 
   /******************************** settle part ***********************************/
   const [billData, setBillData] = useState<IStatus[]>([]);
+  console.log("this is my bill data",billData)
   const [selectedDishes, setSelectedDishes] = useState<string[]>([]);
   const [discountValue, setDiscountValue] = useState(0);
   const [discountMode, setDiscountMode] = useState("rupees");
@@ -424,11 +426,11 @@ function POS() {
             : "sticky top-0 z-50 bg-[#f5f5f5]"
         } `}
       >
-        <Header businessId={businessId} zoneId={zoneId}>
+        <TableHeader businessId={businessId} zoneId={zoneId} tableId={tableId}>
           <div className="font-bold capitalize mr-4 text-[#002D4B] text-xl">
             {tableData.name}
           </div>
-        </Header>
+        </TableHeader>
         <div
           className={`${
             activeButton.toLowerCase() === "status" ||

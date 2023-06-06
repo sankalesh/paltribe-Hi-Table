@@ -8,6 +8,7 @@ import axios from "axios";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { PAGE_TYPES, routePaths } from "@/components/utils/routes";
+import { HiArrowLeft } from "react-icons/hi";
 
 interface IZone {
   businessId: string;
@@ -82,7 +83,10 @@ function Zones() {
   return (
     <div className="bg-[#f5f5f5] min-h-screen pb-6">
       <div className="flex justify-between ml-[1.5rem] pt-[2rem]">
+        {/* <Link href={routePaths.Login(`${businessId}`)}><HiArrowLeft className="text-2xl" /></Link> */}
+        
         <Image width={68} height={25} src={HiPalLogo} alt="Hi Table Logo" />
+        
         <MdMenuOpen className="mr-[1.5rem] text-2xl" />
       </div>
       <div className="mx-[1.5rem] bg-white rounded-2xl pb-[0.5rem] border border-[#e1e1e1]/50 mb-6 mt-[1.5rem]">

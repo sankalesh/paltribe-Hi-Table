@@ -172,11 +172,11 @@ function Table() {
       `https://api.hipal.life/v1/kitchens?businessId=${businessId}`
     );
     const kitchenData = await kitchen.data;
-    const id = kitchenData?.[0]?.id
-    console.log(id)
+    const id = kitchenData?.[0]?.id;
+    console.log(id);
     setKitchenId(id);
   };
-  const handleTableClick = (tableData:any) => {
+  const handleTableClick = (tableData: any) => {
     setTableData(tableData);
   };
 
@@ -188,15 +188,15 @@ function Table() {
 
   return (
     <div className="bg-[#f5f5f5] pb-6 min-h-screen relative">
-      <Header businessId={businessId} zoneId={zoneId}>
-  <Image
-    className="mr-6"
-    width={68}
-    height={25}
-    src={HiPalLogo}
-    alt="Hi Table Logo"
-  />
-</Header>
+      <Header businessId={businessId} zoneId={zoneId} >
+        <Image
+          className="mr-6"
+          width={68}
+          height={25}
+          src={HiPalLogo}
+          alt="Hi Table Logo"
+        />
+      </Header>
       <div className="sticky top-0 z-50 bg-[#f5f5f5]">
         <div className="flex justify-between">
           <div
@@ -272,7 +272,7 @@ function Table() {
                 passHref
               >
                 <div
-                 onClick={() => handleTableClick(ele)}
+                  onClick={() => handleTableClick(ele)}
                   className={`${
                     classByStatus[ele?.status?.toLowerCase()]?.classNames
                   }`}
@@ -322,7 +322,7 @@ function Table() {
                         <MdOutlineDinnerDining
                           className={`right-[5.5rem] top-6 absolute text-[1rem] opacity-50`}
                         />
-                          <div
+                        <div
                           className={`absolute right-20 bottom-6 text-sm font-[500] text-[#2C62F0]`}
                         >
                           {ele?.totalDishQuantity < 10
