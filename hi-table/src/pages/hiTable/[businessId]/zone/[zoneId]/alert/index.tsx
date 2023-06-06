@@ -5,7 +5,7 @@ import Clean from "@/components/atoms/status/clean";
 import Cooked from "@/components/atoms/status/cooked";
 import Paid from "@/components/atoms/status/paid";
 import Header from "@/components/molecules/header";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { HiSearch, HiX } from "react-icons/hi";
 import { MdCreditCard } from "react-icons/md";
 import { SiGoogleassistant } from "react-icons/si";
@@ -61,17 +61,19 @@ function Alert() {
   } = useAlert();
   const [search, setSearch] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
-  const [previousLength, setPreviousLength] = useState(0);
   const [showHistory, setShowHistory] = useState(false);
   const [activeButton, setActiveButton] = useState("");
   const router = useRouter();
   const userDetail = useLogin((s) => s.userDetails);
-  // console.log("this alert page data",data)
+  const previousLengthRef = useRef(0);
 
   const { businessId, zoneId } = router.query as {
     businessId: string;
     zoneId: string;
   };
+
+ 
+
 
   const handleOnclick = (str: string) => {
     str = activeButton.length === 0 ? str : "";
@@ -87,7 +89,6 @@ function Alert() {
   };
 
   const handleItemClick = async (alertId: string) => {
-    console.log(alertId);
     const response = await axios.put(
       `https://api.hipal.life/v1/kitchens/updateAlert/alert?alertId=${alertId}&businessId=${businessId}`
     );
@@ -99,12 +100,36 @@ function Alert() {
     setShowHistory(!showHistory);
   };
   useEffect(() => {
-    onAlertData();
-    offAlertData();
+    onAlertData()
+    const intervalId = setInterval(() => {
+      onAlertData();
+    }, 15000); // 15 seconds interval
+    return () => {
+      clearInterval(intervalId);
+    };
   }, []);
+  async function onAlertData() {
+    const response = await axios.get(
+      `https://api.hipal.life/v1/kitchens/get/AllAlertByWaiter?staffId=${userDetail?.id}&businessId=${businessId}&isAlertOn=true&zoneId=${zoneId}`
+    );
+    const data = await response.data;
+    setData(data);
+
+    if (data.length > previousLengthRef.current) {
+      const sound = new Howl({
+        src: ['/sounds/hotel_bell.mp3'],
+        autoplay: true,
+      });
+
+      sound.play();
+    }
+
+    previousLengthRef.current = data.length;
+  }
+
 
   const popOver = (search = "") => {
-    if (search.length > 0) {
+    if (search.length > 0) { 
       if (!searchOpen) {
         setSearchOpen(true);
       }
@@ -125,30 +150,14 @@ function Alert() {
       ele?.status?.toLowerCase().includes(search.toLowerCase())
   );
 
-  async function onAlertData() {
-    const response = await axios.get(
-      `https://api.hipal.life/v1/kitchens/get/AllAlertByWaiter?staffId=${userDetail?.id}&businessId=${businessId}&isAlertOn=true&zoneId=${zoneId}`
-    );
-    const data = await response.data;
-    if (data.length > newAlertsCount) {
-      setNewAlertsCount(data.length);
-
-      const sound = new Howl({
-        src: ["/sounds/hotel_bell.mp3"],
-        autoplay: true,
-      });
-
-      sound.play();
-    }
-    // setNewAlertsCount(data.length);
-    setData(data);
-  }
+ 
 
   async function offAlertData() {
     const response = await axios.get(
       `https://api.hipal.life/v1/kitchens/get/AllAlertByWaiter?staffId=${userDetail?.id}&businessId=${businessId}&isAlertOn=false&zoneId=${zoneId}`
     );
     const historyData = await response.data;
+    console.log("thhis is my history data",historyData)
     setHistoryData(historyData);
   }
 
@@ -301,7 +310,7 @@ function Alert() {
               className="mx-6 relative bg-gray-200 h-[4.75rem] rounded-xl"
             >
               <div className="font-bold capitalize text-[#002D4B] text-[1rem] leading-[1.25rem] absolute left-4 top-4">
-                {ele?.tableName ? "" : "T-001"}
+                {ele?.tableName}
               </div>
               <div className="font-normal text-[#002D4B]/40 text-[0.875rem] leading-[1rem] absolute right-4 top-4">
                 {ele?.time}

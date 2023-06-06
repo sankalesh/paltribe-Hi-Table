@@ -3,14 +3,14 @@ import { FiChevronDown } from "react-icons/fi";
 import { BsQuestionCircle } from "react-icons/bs";
 import FoodType from "../../../atoms/foodType";
 import { useState } from "react";
-import { IChildCategory, IDish } from "@/components/types/hiTableData";
+import { IChildCategory } from "@/components/types/hiTableData";
 import MenuPopup from "@/components/molecules/menuPopup";
 import Image from "next/image";
-import Ima from "../../../../assets/svg/welcomeLogo.svg";
 import { RxCross2 } from "react-icons/rx";
-import { MdOutlineCleaningServices } from "react-icons/md";
 import { BiBowlRice } from "react-icons/bi";
 import DishQuantityButton from "../../dishDescription/dishQuantityButton";
+import placeHolder from "../../../../assets/svg/placeholder.png";
+
 
 export default function ChildCategory({
   childCategories,
@@ -19,6 +19,7 @@ export default function ChildCategory({
 }) {
   const [openChild, setOpenChild] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  console.log(childCategories);
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -31,7 +32,7 @@ export default function ChildCategory({
     <div className="relative w-full px-6 pb-[5rem] mt-6 overflow-auto">
       {childCategories?.map((category) => (
         <section
-        id={category?.id}
+          id={category?.id}
           key={category?.id}
           className="w-full max-w-md p-4 mx-auto mt-6 bg-white rounded-2xl"
         >
@@ -86,20 +87,22 @@ export default function ChildCategory({
                                         <Image
                                           width={350}
                                           height={200}
-                                          src="https://storage.hipal.life/minio/assets/dae7a31d-7314-4a6b-8417-bc5e17c460bb.jpeg"
+                                          src={
+                                          placeHolder
+                                          }
                                           alt=""
                                         />
                                       </div>
                                       <div className="text-[#002D4B] capitalize font-[500] text-xl mx-4 mt-4">
-                                      {dish?.name}
+                                        {dish?.name}
                                       </div>
                                       <div className=" mx-4 flex text-[#002D4B] text-[1rem] leading-[1.25rem] mt-4">
                                         <FoodType type={dish?.dishType} />
                                         <div>{dish?.dishType}</div>
                                       </div>
                                       <div className="text-[#002D4B] capitalize text-base mx-4 mt-4">
-                                        Average time {dish?.avgTime} minutes(running on
-                                        delay)
+                                        Average time {dish?.avgTime}{" "}
+                                        minutes(running on delay)
                                       </div>
                                       <div className="text-[#002D4B]/40 text-base mx-4 mt-2 line-clamp-3">
                                         Lorem ipsum dolor sit amet consectetur
@@ -113,16 +116,12 @@ export default function ChildCategory({
                                         <BiBowlRice className="mt-1" />
                                         <span>3 portions Available</span>
                                       </div>
-                                      <div className="text-[#002D4B]/40 text-base mx-4 mt-2 line-clamp-3">
-                                      
-                                      </div>
+                                      <div className="text-[#002D4B]/40 text-base mx-4 mt-2 line-clamp-3"></div>
                                       <div className="text-[#2C62F0] flex space-x-2 capitalize text-base mx-4 mt-2">
                                         <BiBowlRice className="mt-1" />
                                         <span>3 portions Available</span>
                                       </div>
-                                      <div className="text-[#002D4B]/40 text-base mx-4 mt-2 line-clamp-3">
-                                      
-                                      </div>
+                                      <div className="text-[#002D4B]/40 text-base mx-4 mt-2 line-clamp-3"></div>
                                     </div>
                                   </MenuPopup>
                                 }

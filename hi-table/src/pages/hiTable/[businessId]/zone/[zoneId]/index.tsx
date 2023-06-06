@@ -33,9 +33,9 @@ interface IZone {
 
 const filterButtons = [
   {
-    name: "occupied",
+    name: "Active",
     Icon: MdAlarm,
-    text: "Occupied",
+    text: "Active",
   },
   {
     name: "Empty",
@@ -77,7 +77,7 @@ const classByStatus: { [key: string]: any } = {
     numberClasses:
       "absolute right-6 bottom-2 text-sm font-[500] text-[#2C62F0]",
   },
-  ["activate"]: {
+  ["active"]: {
     classNames:
       "relative h-[5.75rem] mx-6 mb-4 border border-[#e1e1e1]/50 rounded-xl bg-[#DBFFE2]",
     businessNameClasses:

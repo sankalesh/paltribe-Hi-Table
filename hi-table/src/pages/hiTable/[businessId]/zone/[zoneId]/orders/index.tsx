@@ -34,9 +34,7 @@ function Orders() {
         `https://api.hipal.life/v1/kitchens/waiterKot/update/${id}`
       );
       setOrderAccepted(true);
-      setTimeout(() => {
-        window.history.back();
-      }, 1000);
+     
     } catch (error) {
       console.error("Failed to update order status:", error);
     }

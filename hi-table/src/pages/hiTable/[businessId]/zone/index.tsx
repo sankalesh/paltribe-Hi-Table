@@ -70,7 +70,7 @@ function Zones() {
   const result = async () => {
     try {
       const response = await axios.get(
-        `https://api.hipal.life/v1/zones/getAllZoneByWaiter?businessId=${businessId}&waiterId=${userDetails.userDetails.id}`
+        `https://api.hipal.life/v1/zones/getAllZoneByWaiter?businessId=${businessId}&waiterId=${userDetail.id}`
       );
       console.log(response.data.data);
       setZones(response.data.data);

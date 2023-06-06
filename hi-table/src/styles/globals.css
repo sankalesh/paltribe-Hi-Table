@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@media (prefers-color-scheme: dark) {
+    .dark\:bg-black {
+      background-color: white; /* Replace with your preferred light background color */
+    }
+    
+    /* Add more class overrides here to disable dark mode styles */
+  }

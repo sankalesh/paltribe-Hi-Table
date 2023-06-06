@@ -246,7 +246,9 @@ function POS() {
   };
 
   const handleDiscountChange = (e: any) => {
-    setDiscountValue(e.target.value);
+    const value = e.target.value.replace(/[^0-9\b]/g, "");
+    // console.log(Math.abs(value))
+    setDiscountValue(Math.abs(value));
   };
 
   const handleDiscountModeChange = (e: any) => {
@@ -297,8 +299,9 @@ function POS() {
         let total = subtotal;
 
         if (selectedDishes.length === 0) {
-          total -= discountValue;
-          setDiscount(discountValue);
+          const maxdiscountValue = Math.min(discountValue, total);
+          total -= maxdiscountValue;
+          setDiscount(maxdiscountValue);
           getBill();
         }
       }
@@ -327,7 +330,8 @@ function POS() {
 
         if (selectedDishes.length === 0) {
           if (discountValue > 0) {
-            const discount = (subTotal * discountValue) / 100;
+            const maxdiscountValue = Math.min(discountValue, 100);
+            const discount = (subTotal * maxdiscountValue) / 100;
             getBill();
             setDiscount(discount);
             subTotal -= discount;
@@ -494,7 +498,7 @@ function POS() {
           {statusData.map((ele, i) => {
             // Get the first element from the current sub-array
             const kot = ele[0];
-
+            // console.log("this is my status",ele)
             return (
               <div key={kot?.id}>
                 {ele.dishStatus !== "" && (
@@ -502,7 +506,7 @@ function POS() {
                     <div className="flex justify-between pt-4 mx-4">
                       <div className="flex flex-col">
                         <div className="font-[500] capitalize">
-                          {ele?.tableName ? ele?.tableName : "T-001"}
+                          {kot?.tableName}
                         </div>
                         <div className="capitalize font-normal text-[#002D4B]/40 text-[0.875rem] mt-1 leading-[1rem]">
                           {kot?.customerName}
@@ -614,7 +618,15 @@ function POS() {
                                   </button>
                                 </div>
                               )}
-                              <div className={`${selectedDishStatus?.dishStatus === "delivered" ? "hidden" : "fixed bottom-0 z-20 w-full py-2 mx-6 shadow-lg shadow-base-100"}`}>
+                              <div
+                                className={`${
+                                  selectedDishStatus?.dishStatus ===
+                                    "delivered" ||
+                                  selectedDishStatus?.dishStatus === "cooking"
+                                    ? "hidden"
+                                    : "fixed bottom-0 z-20 w-full py-2 mx-6 shadow-lg shadow-base-100"
+                                }`}
+                              >
                                 <button
                                   onClick={() =>
                                     handleDishStatus(selectedDishStatus?._id)
@@ -728,7 +740,6 @@ function POS() {
                 <div className="pb-[5rem] top-6 mx-6 absolute inset-0 overflow-y-auto">
                   {Object.values(cart)?.map((cartItem, index) => {
                     const { dishData, variants } = cartItem;
-                    // const { name, price } = dishData;
                     const name = dishData?.name;
                     const price = dishData?.price;
 
@@ -740,6 +751,7 @@ function POS() {
                             (item: any) => item?.quantity > 0
                           )
                         : [];
+                        console.log("this are selected extra",selectedExtra )
                       return (
                         <div key={`${dishData?.id}-${index}-${variantIndex}`}>
                           <div className="relative flex justify-between mt-6">
@@ -752,22 +764,21 @@ function POS() {
                                   ? name
                                   : name?.slice(0, 35) + "..."}
                               </div>
-                              {selectedPortion?.length > 0 && (
-                                <div className=" text-[#002D4B]/50 font-[500] mt-1 text-[1rem] leading-[1.25rem]">
-                                  <div>{selectedPortion}</div>
-                                  <div>
-                                    {selectedExtra.map(
-                                      (extraItem: any, extraIndex) => (
-                                        <div
-                                          key={`${dishData?.id}-${index}-${variantIndex}-${extraIndex}`}
-                                        >
-                                          {extraItem.name}
-                                        </div>
-                                      )
-                                    )}
-                                  </div>
+
+                              <div className=" text-[#002D4B]/50 font-[500] mt-1 text-[1rem] leading-[1.25rem]">
+                                <div>{selectedPortion}</div>
+                                <div>
+                                  {selectedExtra.map(
+                                    (extraItem: any, extraIndex) => (
+                                      <div
+                                        key={`${dishData?.id}-${index}-${variantIndex}-${extraIndex}`}
+                                      >
+                                        <span className="mr-2 text-sm">{extraItem?.quantity}</span>x<span className="ml-2 text-sm">{extraItem?.name}</span>
+                                      </div>
+                                    )
+                                  )}
                                 </div>
-                              )}
+                              </div>
 
                               <div className="flex justify-between">
                                 <div className="text-[#002D4B]/50 mt-4 font-[500] text-[1rem] leading-[1.25rem]">
@@ -780,9 +791,7 @@ function POS() {
                                 </div>
 
                                 <div
-                                  onClick={() =>
-                                    handleDeleteItem(id)
-                                  }
+                                  onClick={() => handleDeleteItem(id)}
                                   className="text-[#2C62F0] rounded-2xl px-6 py-2 bg-white mt-1 -mr-[6rem] font-[500] text-[1rem] leading-[1.25rem]"
                                 >
                                   Delete
@@ -870,40 +879,45 @@ function POS() {
               </div>
             </div>
           )}
-          <div className="flex justify-between capitalize font-[500] mx-4 my-4 text-[#002D4B] text-[1rem] leading-[1.25rem]">
-            <div className="w-[50%]">Items</div>
-            <div>Quantity</div>
-            <div>Cost</div>
-          </div>
-          <div className="overflow-auto max-h-[20rem] min-h-[15rem] pb-4">
-            {billData.slice(0, billData.length - 2).map((bill, index) => (
-              <div
-                key={bill?.id}
-                className={`flex justify-between capitalize font-[500] mx-4 mt-4 text-[#002D4B] text-[1rem] leading-[1.25rem] ${
-                  index !== billData.length - 3
-                    ? "pb-4 border-b border-dashed"
-                    : ""
-                }`}
-              >
-                <div className="w-[60%] font-[500]">
-                  {bill?.dish?.name}
-                  <div className="capitalize font-normal text-[#002D4B]/40 text-[0.875rem] mt-1 leading-[1rem]">
-                    {bill?.dish?.portions?.name}
-                  </div>
-                  <div className="capitalize font-normal text-[#002D4B]/40 text-[0.875rem] mt-1 leading-[1rem]">
-                    {bill?.dish?.extras?.map((extra, index) => (
-                      <span key={index}>{extra?.name}, </span>
-                    ))}
-                  </div>
-                </div>
-                <div className="flex justify-center">{bill?.dish?.qty}</div>
-                <div className="">₹ {bill?.dish?.price}</div>
+          {billData && billData.length > 0 && (
+            <>
+              <div className="flex justify-between capitalize font-[500] mx-4 my-4 text-[#002D4B] text-[1rem] leading-[1.25rem]">
+                <div className="w-[50%]">Items</div>
+                <div>Quantity</div>
+                <div>Cost</div>
               </div>
-            ))}
-          </div>
-          <div className="pb-2 mx-4">
-            <hr className="border-gray-500" />
-          </div>
+              <div className="overflow-auto max-h-[20rem] min-h-[15rem] pb-4">
+                {billData.slice(0, billData.length - 2).map((bill, index) => (
+                  <div
+                    key={bill?.id}
+                    className={`flex justify-between capitalize font-[500] mx-4 mt-4 text-[#002D4B] text-[1rem] leading-[1.25rem] ${
+                      index !== billData.length - 3
+                        ? "pb-4 border-b border-dashed"
+                        : ""
+                    }`}
+                  >
+                    <div className="w-[60%] font-[500]">
+                      {bill?.dish?.name}
+                      <div className="capitalize font-normal text-[#002D4B]/40 text-[0.875rem] mt-1 leading-[1rem]">
+                        {bill?.dish?.portions?.name}
+                      </div>
+                      <div className="capitalize font-normal text-[#002D4B]/40 text-[0.875rem] mt-1 leading-[1rem]">
+                        {bill?.dish?.extras?.map((extra, index) => (
+                          <span key={index}>{extra?.name}, </span>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex justify-center">{bill?.dish?.qty}</div>
+                    <div className="">₹ {bill?.dish?.price}</div>
+                  </div>
+                ))}
+              </div>
+              <div className="pb-2 mx-4">
+                <hr className="border-gray-500" />
+              </div>
+            </>
+          )}
+
           {footButton.toLowerCase() === "discount" ? (
             <PaymentPopup show={isModalOpen} onClose={closeModal}>
               <div className="relative">
@@ -991,6 +1005,7 @@ function POS() {
                     <div key={method.id} className="flex items-center mt-2">
                       <input
                         type="checkbox"
+                        value="0"
                         checked={selectedPaymentMethod === method?.id}
                         onChange={() =>
                           handlePaymentMethodSelection(method?.id)
@@ -1017,7 +1032,6 @@ function POS() {
               </div>
             </PaymentPopup>
           )}
-
           {billData[billData.length - 1] && (
             <div>
               <div className="flex justify-between mx-4 capitalize font-[500] text-[#002D4B] text-[1rem] leading-[1.25rem]">
@@ -1064,7 +1078,11 @@ function POS() {
             getBill();
             footerButton("continue");
           }}
-          className="absolute text-sm font-[500] px-4 py-2 mr-2 border-white border text-[#2C62F0] bg-white rounded-full right-6 bottom-3"
+          className={`${
+            billData.length > 0
+              ? "absolute text-sm font-[500] px-4 py-2 mr-2 border-white border text-[#2C62F0] bg-white rounded-full right-6 bottom-3"
+              : "hidden"
+          }`}
         >
           Continue
         </button>

@@ -22,7 +22,6 @@ function Footer() {
   const path = pathParts[pathParts.length - 1];
 
   const { data, newAlertsCount } = useAlert();
-  console.log("this data is comes from footer", data);
 
   useEffect(() => {}, [data]);
 
